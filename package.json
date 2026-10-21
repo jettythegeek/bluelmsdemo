@@ -1,0 +1,13 @@
+{
+  "name": "bluelms-nextgen-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BlueLMS NextGen management product-vision demonstration",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build": "node scripts/build.js",
+    "check": "node scripts/check.js"
+  },
+  "dependencies": { "qrcode-generator": "^1.4.4" },
+  "engines": { "node": ">=18" }
+}

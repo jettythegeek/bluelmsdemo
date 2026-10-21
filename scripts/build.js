@@ -1,0 +1,11 @@
+const fs = require('fs');
+const path = require('path');
+const root = path.resolve(__dirname, '..');
+const out = path.join(root, 'dist');
+fs.rmSync(out, { recursive: true, force: true });
+fs.mkdirSync(out, { recursive: true });
+for (const file of ['index.html', 'styles.css', 'app.js', 'demo-config.js']) fs.copyFileSync(path.join(root, file), path.join(out, file));
+const qrOut = path.join(out, 'node_modules', 'qrcode-generator');
+fs.mkdirSync(qrOut, { recursive: true });
+fs.copyFileSync(path.join(root, 'node_modules', 'qrcode-generator', 'qrcode.js'), path.join(qrOut, 'qrcode.js'));
+console.log(`Built static demo to ${out}`);
