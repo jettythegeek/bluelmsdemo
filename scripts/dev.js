@@ -7,6 +7,7 @@ const types = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=ut
 http.createServer((req,res) => {
   const pathname = decodeURIComponent(req.url.split('?')[0]);
   let file = pathname === '/' ? 'index.html' : pathname.replace(/^\//,'');
+  if (file === 'vendor/qrcode.js') file = 'node_modules/qrcode-generator/qrcode.js';
   const target = path.resolve(root, file);
   if (!target.startsWith(root) || !fs.existsSync(target) || fs.statSync(target).isDirectory()) file = 'index.html';
   const finalPath = path.join(root, file);
