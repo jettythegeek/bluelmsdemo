@@ -8,4 +8,5 @@ for (const file of ['index.html', 'styles.css', 'app.js', 'demo-config.js']) fs.
 const qrOut = path.join(out, 'vendor');
 fs.mkdirSync(qrOut, { recursive: true });
 fs.copyFileSync(path.join(root, 'node_modules', 'qrcode-generator', 'qrcode.js'), path.join(qrOut, 'qrcode.js'));
+fs.cpSync(path.join(root, 'assets'), path.join(out, 'assets'), { recursive: true });
 console.log(`Built static demo to ${out}`);
