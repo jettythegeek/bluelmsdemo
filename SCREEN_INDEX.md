@@ -1,6 +1,6 @@
 # BlueLMS NextGen screen index
 
-Verified total: **61 first-level routes**, plus the welcome screen. All routes use hash navigation and work on static hosting.
+Verified total: **59 first-level routes**, plus the welcome screen. All routes use hash navigation and work on static hosting.
 
 ## BGDL Control Centre — 11
 
@@ -27,7 +27,6 @@ Verified total: **61 first-level routes**, plus the welcome screen. All routes u
 - [x] `#/school/timetable` — Timetable
 - [x] `#/school/examinations-results` — Examinations & Results
 - [x] `#/school/attendance` — Attendance
-- [x] `#/school/school-finance` — School Finance
 - [x] `#/school/assets-maintenance` — Assets & Maintenance
 - [x] `#/school/communication-centre` — Communication Centre
 - [x] `#/school/school-reports` — School Reports
@@ -68,7 +67,6 @@ Every Student Learning route has functional Primary and Secondary presentation m
 - [x] `#/parent/my-children` — My Children
 - [x] `#/parent/academic-progress` — Academic Progress
 - [x] `#/parent/attendance` — Attendance
-- [x] `#/parent/fees-payments` — Fees & Payments
 - [x] `#/parent/messages` — Messages
 - [x] `#/parent/school-calendar` — School Calendar
 - [x] `#/parent/announcements` — Announcements

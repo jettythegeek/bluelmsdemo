@@ -10,7 +10,7 @@ Open **Executive Overview**. Present the portfolio view, then move to **Devices 
 
 ## 3. School Management — 2 minutes
 
-Use the workspace switcher and open **School Overview**. Change the school selector once to demonstrate multi-school context. Move to **School Finance** to show management visibility without attempting a transaction.
+Use the workspace switcher and open **School Overview**. Change the school selector once to demonstrate multi-school context. Review **Assets & Maintenance** to show operational readiness.
 
 ## 4. Teacher Studio — 2 minutes
 
@@ -22,7 +22,7 @@ Open **Learning Home**, then **Lesson Viewer**. Switch between Primary and Secon
 
 ## 6. Parent Connect — 2 minutes
 
-Open **Family Overview**, then **Academic Progress** or **Fees & Payments**. Emphasise linked children, simple language and clear boundaries around payment functionality.
+Open **Family Overview**, then **Academic Progress** or **Attendance**. Emphasise linked children, simple language and clear, family-friendly learning context.
 
 ## 7. Stakeholder Intelligence and close — 2 minutes
 
@@ -33,4 +33,4 @@ Open **Oversight Overview**, then **Learning Outcomes**. Point out that this wor
 - Use the provided routes in this order and avoid improvising operational actions.
 - Keep a built `dist/` copy available locally; no internet connection is required for core rendering.
 - If asked whether a control works, say: “This prototype validates the experience. Production workflows follow technical and safeguarding validation.”
-- Use the in-app **61 screens** button when management asks about breadth.
+- Use the in-app **59 screens** button when management asks about breadth.
