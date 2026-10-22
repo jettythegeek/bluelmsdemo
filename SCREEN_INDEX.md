@@ -1,6 +1,6 @@
 # BlueLMS NextGen screen index
 
-Verified total: **59 first-level routes**, plus the welcome screen. All routes use hash navigation and work on static hosting.
+Verified total: **61 first-level routes**, plus the welcome screen. All routes use hash navigation and work on static hosting.
 
 ## BGDL Control Centre — 11
 
@@ -80,3 +80,4 @@ Every Student Learning route has functional Primary and Secondary presentation m
 - [x] `#/stakeholder/attendance-trends` — Attendance Trends
 - [x] `#/stakeholder/infrastructure-status` — Infrastructure Status
 - [x] `#/stakeholder/executive-reports` — Executive Reports
+Virtual Lab: `#/student/virtual-lab` — five subject laboratories with an interactive Physics circuit practical.

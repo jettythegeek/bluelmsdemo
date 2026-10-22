@@ -220,6 +220,12 @@ const workspaces = [
         kind: "gradebook",
       },
       {
+        path: "virtual-lab",
+        title: "Virtual Lab",
+        desc: "Guide practicals, manage student access and follow their discoveries.",
+        kind: "teacherlab",
+      },
+      {
         path: "ai-teaching-assistant",
         title: "AI Teaching Assistant",
         desc: "A scripted example of planning support with teacher control.",
@@ -294,6 +300,12 @@ const workspaces = [
         title: "Achievements",
         desc: "See the badges you earned by learning and trying.",
         kind: "achievements",
+      },
+      {
+        path: "virtual-lab",
+        title: "Virtual Lab",
+        desc: "Explore, experiment and discover how things work.",
+        kind: "virtuallab",
       },
       {
         path: "timetable",
@@ -625,6 +637,7 @@ function navIcon(label) {
       Messages: "chat-teardrop-text",
       "Learning Home": "rocket-launch",
       "My Subjects": "book-bookmark",
+      "Virtual Lab": "flask",
       "Lesson Viewer": "play-circle",
       "Tests & Exams": "pencil-line",
       "Results & Progress": "chart-line-up",
@@ -780,13 +793,7 @@ function dashboardSupplement(kind) {
 }
 
 function studentGuide(kind) {
-  const score = 78;
   const messages = {
-    studentdash: [
-      "Hi Amara! Ready for a bright day?",
-      "You have three learning adventures today. Start with the one that feels right.",
-      "rocket-launch",
-    ],
     subjects: [
       "What would you like to learn, Amara?",
       "Pick a subject to see your lessons, activities and next small goal.",
@@ -802,47 +809,10 @@ function studentGuide(kind) {
       "Do one step at a time. Your fraction journal is due first.",
       "notebook",
     ],
-    studenttests: [
-      "Amara, you have two upcoming tests.",
-      "Your next test is Mathematics. A short practice today will help you feel ready.",
-      "exam",
-    ],
-    progress:
-      score >= 70
-        ? [
-            "You’re doing well, Amara!",
-            `Your learning score is ${score}%. Keep practising and be proud of every step.`,
-            "trophy",
-          ]
-        : [
-            "Keep going, Amara. You can improve.",
-            "Try one short lesson today and ask your teacher when you need help.",
-            "plant",
-          ],
-    library: [
-      "What will you discover today, Amara?",
-      "Choose a story, a science idea or a fun number activity.",
-      "book-open",
-    ],
-    studentai: [
-      "Need a little help, Amara?",
-      "Your Learning Buddy can explain one step at a time using easy words.",
-      "robot",
-    ],
-    achievements: [
-      "Look how far you’ve come, Amara!",
-      "You earned eight badges. Every badge shows something new you can do.",
-      "medal",
-    ],
     studenttime: [
       "Here is your school day, Amara.",
       "Your next lesson is Mathematics at 9:20. You have time to get ready.",
       "clock-countdown",
-    ],
-    offline: [
-      "Your lessons can travel with you, Amara.",
-      "Twenty-six lessons are ready on this device, even when there is no internet.",
-      "laptop",
     ],
   };
   const message = messages[kind];
@@ -858,6 +828,90 @@ function studentGuide(kind) {
     "trophy",
   ];
   return `<section class="student-guide"><div class="student-guide-copy"><span>YOUR LEARNING SPACE</span><h2>${message[0]}</h2><p>${message[1]}</p></div><i class="student-guide-main">${icon(message[2], 34)}</i><div class="student-motifs" aria-hidden="true">${motifs.map((name) => icon(name, 22)).join("")}</div></section>`;
+}
+
+function labSession() {
+  const defaults = { enabled: true, paused: false, instructions: "Close the switch. Record the current at 2 V, 4 V and 6 V, then explain the pattern you notice.", target: 3 };
+  try { return { ...defaults, ...JSON.parse(localStorage.getItem("bluelms-lab-session") || "{}") }; } catch { return defaults; }
+}
+function labActivity() {
+  try { return JSON.parse(localStorage.getItem("bluelms-lab-activity") || '{"readings":[],"reflection":"","started":false}'); } catch { return { readings: [], reflection: "", started: false }; }
+}
+function saveLabActivity(activity) {
+  localStorage.setItem("bluelms-lab-activity", JSON.stringify({ ...activity, updated: new Date().toISOString() }));
+}
+function escapeLab(value) {
+  return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+function teacherLab() {
+  const session = labSession(), activity = labActivity();
+  const complete = new Set(activity.readings.map(r => r.voltage)).size >= session.target && activity.reflection.trim().length > 0;
+  return `<div class="teacher-lab-banner"><div><span>YOUR CLASSROOM, CONNECTED</span><h2>Turn curiosity into discovery.</h2><p>Set the mission, open the lab and give every learner the support to keep going.</p></div>${icon("flask", 64)}</div><div class="teacher-lab-note">${icon("info", 18)} Local demo · Controls and Amara’s activity are shared across tabs in this browser. Other students and devices are not connected.</div><div class="teacher-lab-grid"><section class="panel teacher-lab-settings"><header><span>SESSION CONTROLS</span><h2>Physics · Simple electric circuits</h2><p>Basic 5A · Whole class</p></header><form id="teacher-lab-form"><label class="lab-check"><input id="teacher-lab-enabled" type="checkbox" ${session.enabled ? "checked" : ""}/> Make Physics visible to students</label><label class="lab-check"><input id="teacher-lab-paused" type="checkbox" ${session.paused ? "checked" : ""}/> Pause practical activity</label><p class="lab-field-help">Pausing keeps the instructions visible and stops circuit controls and new readings.</p><label for="teacher-lab-instructions">Student mission</label><textarea id="teacher-lab-instructions" required maxlength="1200">${escapeLab(session.instructions)}</textarea><label for="teacher-lab-target">Required readings at different voltages</label><select id="teacher-lab-target">${[2,3,4,5,6].map(n => `<option value="${n}" ${Number(session.target) === n ? "selected" : ""}>${n} readings</option>`).join("")}</select><p class="lab-field-help">A written observation is also required to finish the practical.</p><button type="submit">Save student instructions</button><p id="teacher-lab-feedback" role="status"></p></form><div class="teacher-lab-availability"><h3>Other laboratories</h3><p>Chemistry · Biology · Home Economics · Geography</p><small>Coming soon · Practical activities are not yet available.</small></div><a href="#/student/virtual-lab">View student laboratory ${icon("arrow-right", 16)}</a></section><section class="panel teacher-lab-monitor"><header><span>LEARNER ACTIVITY</span><h2>Follow the practical</h2><button id="refresh-lab-monitor">${icon("arrows-clockwise", 16)} Refresh activity</button></header><div class="lab-monitor-summary"><div><strong>${activity.started ? 1 : 0}</strong><span>Started</span></div><div><strong>${activity.readings.length}</strong><span>Readings recorded</span></div><div><strong>${complete ? 1 : 0}</strong><span>Completed</span></div></div><div class="lab-learner-detail"><div class="lab-learner-heading"><div><h3>Amara Okafor</h3><small>Basic 5A · Connected demo learner</small></div><span class="lab-status">${complete ? "COMPLETED" : activity.started ? "IN PROGRESS" : "NOT STARTED"}</span></div><p>${new Set(activity.readings.map(r => r.voltage)).size} / ${session.target} different voltage readings · Observation ${activity.reflection.trim() ? "written" : "pending"}</p><progress max="100" value="${Math.round((Math.min(new Set(activity.readings.map(r => r.voltage)).size / session.target,1) * .75 + (activity.reflection.trim() ? .25 : 0)) * 100)}" aria-label="Amara practical progress"></progress><small>${activity.updated ? `Last activity: ${escapeLab(new Date(activity.updated).toLocaleString())}` : "Waiting for Amara to enter the Physics lab."}</small></div><h3>Recorded observations</h3><div class="lab-monitor-table"><table><thead><tr><th>Trial</th><th>Voltage</th><th>Current</th></tr></thead><tbody>${activity.readings.length ? activity.readings.map((r,i) => `<tr><td>${i+1}</td><td>${escapeLab(r.voltage)} V</td><td>${escapeLab(r.current)} A</td></tr>`).join("") : '<tr><td colspan="3">No readings yet. Open the student lab to begin.</td></tr>'}</tbody></table></div><h3>Student reflection</h3><blockquote>${escapeLab(activity.reflection || "Amara has not written an observation yet.")}</blockquote></section></div>`;
+}
+function bindTeacherLab() {
+  const form = $("#teacher-lab-form");
+  if (!form) return;
+  form.onsubmit = e => {
+    e.preventDefault();
+    localStorage.setItem("bluelms-lab-session", JSON.stringify({ enabled: $("#teacher-lab-enabled").checked, paused: $("#teacher-lab-paused").checked, instructions: $("#teacher-lab-instructions").value.trim(), target: Number($("#teacher-lab-target").value) }));
+    render();
+    $("#teacher-lab-feedback").textContent = "Saved. Student access and instructions have been updated.";
+  };
+  $("#refresh-lab-monitor").onclick = render;
+}
+function virtualLab() {
+  return `<section id="lab-picker"><div class="lab-intro"><div class="lab-welcome-copy"><span>${icon("sparkle", 16)} YOUR NEXT DISCOVERY STARTS HERE</span><h2>Big ideas start with<br>a little <em>“what if?”</em></h2><p>You already have what it takes, Amara: curiosity. Try an idea, see what happens and discover something new.</p><div class="lab-hero-tags"><span>${icon("hand-heart", 18)} Learn at your pace</span><span>${icon("arrow-counter-clockwise", 18)} Try as many times as you like</span></div></div><div class="lab-discovery-art" aria-hidden="true"><div class="lab-art-orbit"></div><div class="lab-art-symbol lab-art-atom">${icon("atom", 64)}</div><div class="lab-art-symbol lab-art-flask">${icon("flask", 98)}</div><div class="lab-art-symbol lab-art-leaf">${icon("leaf", 38)}</div><span class="lab-art-note">A curious mind can change the world.</span><i class="lab-art-spark">${icon("sparkle", 28)}</i></div></div><div class="lab-confidence"><span>${icon("lightbulb", 23)}</span><p><b>You don’t need all the answers to begin.</b> Every experiment is a chance to learn. You can reset, rethink and try again.</p></div><div class="lab-section-heading"><div><span>FIVE WAYS TO EXPLORE</span><h2>Where will your curiosity take you?</h2></div><p>Start with Physics. More discoveries are on the way.</p></div><div class="lab-options">${[
+    ["Physics", "lightning", "Explore electricity, forces and motion.", "Simple electric circuits", true],
+    ["Chemistry", "flask", "Discover reactions and the building blocks of matter.", "Reactions and mixtures"],
+    ["Biology", "plant", "Take a closer look at living things.", "Cells and living systems"],
+    ["Home Economics", "cooking-pot", "Practise skills for healthy everyday living.", "Food and nutrition"],
+    ["Geography", "globe", "Investigate our planet and its changing landscapes.", "Weather and landscapes"],
+  ].map(([name, glyph, description, topic, ready], i) => `<article class="lab-option lab-color-${i} ${ready ? "lab-featured" : ""}"><div class="lab-card-top"><div class="lab-option-icon">${icon(glyph, 32)}</div><span class="lab-status">${ready ? "START HERE" : "COMING SOON"}</span></div><h2>${name}</h2><p>${description}</p><div class="lab-topic"><span>${ready ? "YOUR FIRST MISSION" : "ON THE HORIZON"}</span><strong>${topic}</strong>${ready ? '<small>Beginner friendly · 10–15 min</small>' : ''}</div>${ready ? '<p class="lab-card-encourage">Make a bulb glow. See your ideas come to life.</p>' : ''}<button ${ready ? 'id="open-physics"' : 'disabled'}>${ready ? "Let’s make a discovery" : "More to explore soon"}${icon("arrow-right", 17)}</button></article>`).join("")}</div><div class="lab-discovery-steps"><div><span>01</span><b>Wonder</b><p>Ask a question. Make a prediction.</p></div><div><span>02</span><b>Experiment</b><p>Change one thing. Watch what happens.</p></div><div><span>03</span><b>Discover</b><p>Record what you notice. Make it yours.</p></div></div></section>
+  <section id="physics-lab" hidden><div class="lab-toolbar"><button id="back-labs">${icon("arrow-left", 17)} All laboratories</button><span>PHYSICS / ELECTRICITY</span><span class="lab-status">INTERACTIVE PRACTICAL</span></div><div class="lab-workspace"><aside class="lab-instructions"><span>PRACTICAL 01</span><h2>Light up a circuit</h2><p>How does voltage affect the current flowing through a circuit?</p><div class="lab-goal"><b>Your mission</b><p>Close the switch, change the voltage and record what you observe.</p></div><h3>On your bench</h3><ul><li>Variable power supply</li><li>Switch and connecting wires</li><li>10 Ω lamp (idealised model)</li><li>Ammeter and voltmeter</li></ul><h3>Try it yourself</h3><ol><li>Close the switch to complete the circuit.</li><li>Set the voltage to 2 V, 4 V and 6 V.</li><li>Record each reading. What pattern do you notice?</li></ol><small>Simulation only · Lamp resistance stays constant in this simplified model.</small></aside><main class="lab-bench"><header><div><small>EXPERIMENT BENCH</small><h3>Simple electric circuit</h3></div><button id="reset-circuit">${icon("arrow-counter-clockwise", 16)} Reset</button></header><div class="circuit-stage"><svg viewBox="0 0 640 310" role="img" aria-label="Circuit with a power supply, switch, ammeter and lamp"><path id="circuit-wire" d="M120 230V85H265 M325 85H520V230H120" fill="none" stroke="#8297ad" stroke-width="5" stroke-linejoin="round"/><path id="circuit-switch" d="M265 85L320 54" stroke="#214a80" stroke-width="6" stroke-linecap="round"/><circle cx="265" cy="85" r="6" fill="#214a80"/><circle cx="325" cy="85" r="6" fill="#214a80"/><rect x="77" y="131" width="86" height="65" rx="12" fill="#214a80"/><text id="supply-label" x="120" y="170" text-anchor="middle" fill="white" font-size="21">2 V</text><text x="120" y="267" text-anchor="middle" fill="#49677f" font-size="14">Power supply</text><circle cx="410" cy="85" r="28" fill="white" stroke="#214a80" stroke-width="3"/><text x="410" y="93" text-anchor="middle" fill="#214a80" font-size="22">A</text><circle id="circuit-lamp" cx="520" cy="172" r="38" fill="#e8eff8" stroke="#214a80" stroke-width="3"/><path d="M497 149L543 195M543 149L497 195" stroke="#214a80" stroke-width="3"/><text x="520" y="267" text-anchor="middle" fill="#49677f" font-size="14">10 Ω lamp</text><text x="295" y="33" text-anchor="middle" fill="#49677f" font-size="14">Switch</text></svg><div id="circuit-status" role="status">Switch open · No current is flowing</div></div><div class="lab-controls"><label for="lab-voltage">Supply voltage <strong id="voltage-value">2 V</strong><input id="lab-voltage" type="range" min="1" max="6" step="1" value="2"/><span>1 V <span>6 V</span></span></label><button id="toggle-circuit" aria-pressed="false">Close switch</button></div><div class="lab-meters"><div><small>VOLTAGE</small><strong id="meter-voltage">2 V</strong></div><div><small>CURRENT</small><strong id="meter-current">0.00 A</strong></div><div><small>RESISTANCE</small><strong>10 Ω</strong></div></div><section class="lab-notebook"><header><div><small>YOUR LAB NOTEBOOK</small><h3>Observation table</h3></div><button id="record-reading" disabled>Record reading</button></header><p id="lab-record-hint" role="status">Close the switch to record your first observation.</p><table><thead><tr><th>Trial</th><th>Voltage (V)</th><th>Current (A)</th><th>Resistance (Ω)</th></tr></thead><tbody id="lab-readings"></tbody></table><label for="lab-reflection">What happens to the current when you increase the voltage?</label><textarea id="lab-reflection" placeholder="Write your observation here…"></textarea><small>Notebook entries stay here until you reset or leave this page.</small></section></main></div></section>`;
+}
+
+function bindVirtualLab() {
+  const open = $("#open-physics");
+  if (!open) return;
+  const session = labSession();
+  let activity = labActivity();
+  const mission = document.createElement("div");
+  mission.className = "student-lab-mission";
+  mission.innerHTML = `<span>YOUR TEACHER’S MISSION</span><p>${escapeLab(session.instructions)}</p><small>${session.target} different voltage readings + your written observation${session.paused ? " · Practical paused by your teacher" : ""}</small>`;
+  $("#physics-lab").prepend(mission);
+  if (!session.enabled) { open.disabled = true; open.textContent = "Not opened by your teacher"; open.closest("article").querySelector(".lab-status").textContent = "TEACHER ACCESS REQUIRED"; }
+  let closed = false, trials = 0;
+  const voltage = $("#lab-voltage");
+  const update = () => {
+    const volts = Number(voltage.value);
+    $("#voltage-value").textContent = $("#meter-voltage").textContent = $("#supply-label").textContent = `${volts} V`;
+    $("#meter-current").textContent = `${closed ? (volts / 10).toFixed(2) : "0.00"} A`;
+    $("#circuit-switch").setAttribute("d", closed ? "M265 85L325 85" : "M265 85L320 54");
+    $("#circuit-wire").setAttribute("stroke", closed ? "#158a7b" : "#8297ad");
+    $("#circuit-lamp").setAttribute("fill", closed ? `hsl(44 100% ${90 - volts * 5}%)` : "#e8eff8");
+    $("#toggle-circuit").textContent = closed ? "Open switch" : "Close switch";
+    $("#toggle-circuit").setAttribute("aria-pressed", String(closed));
+    $("#record-reading").disabled = !closed || session.paused;
+    $("#circuit-status").textContent = closed ? "Circuit complete · The lamp is glowing" : "Switch open · No current is flowing";
+    $("#lab-record-hint").textContent = closed ? "Change the voltage and record a reading for each trial." : "Close the switch to record your first observation.";
+  };
+  open.onclick = () => { if (!session.enabled) return; activity.started = true; saveLabActivity(activity); $("#lab-picker").hidden = true; $("#physics-lab").hidden = false; $("#back-labs").focus(); };
+  $("#back-labs").onclick = () => { $("#physics-lab").hidden = true; $("#lab-picker").hidden = false; open.focus(); };
+  voltage.oninput = update;
+  $("#toggle-circuit").onclick = () => { closed = !closed; update(); };
+  $("#record-reading").onclick = () => {
+    if (!closed || session.paused) return;
+    activity.readings.push({ voltage: Number(voltage.value), current: (Number(voltage.value) / 10).toFixed(2) }); saveLabActivity(activity);
+    $("#lab-readings").insertAdjacentHTML("beforeend", `<tr><td>${++trials}</td><td>${voltage.value}</td><td>${(Number(voltage.value) / 10).toFixed(2)}</td><td>10</td></tr>`);
+    $("#lab-record-hint").textContent = `Trial ${trials} recorded. Try another voltage.`;
+  };
+  $("#lab-reflection").value = activity.reflection;
+  $("#lab-reflection").oninput = e => { activity.reflection = e.target.value; saveLabActivity(activity); };
+  activity.readings.forEach(r => { $("#lab-readings").insertAdjacentHTML("beforeend", `<tr><td>${++trials}</td><td>${escapeLab(r.voltage)}</td><td>${escapeLab(r.current)}</td><td>10</td></tr>`); });
+  $("#reset-circuit").onclick = () => { closed = false; voltage.value = "2"; update(); };
+  ["#toggle-circuit", "#lab-voltage", "#reset-circuit", "#lab-reflection"].forEach(selector => { $(selector).disabled = session.paused; });
+  $(".lab-notebook>small").textContent = "Your observations are saved in this browser and shared with the teacher demo.";
+  update();
 }
 
 function personalizeStudentCopy(kind) {
@@ -924,11 +978,56 @@ function personalizeStudentCopy(kind) {
   }
 }
 
+function stakeholderDashboard() {
+  const records = schools.map((s, i) => ({ ...s,
+    present: [457,339,555][i], staffPresent: [23,17,35][i],
+    candidates: [90,72,120][i], passed: [78,54,78][i],
+    eligible: [440,340,570][i], promoted: [409,299,467][i],
+    previous: [458,350,579][i],
+    trend: [[92,93,93,94,92,94,95,94],[89,90,92,91,90,92,91,91],[87,88,89,88,90,89,90,89]][i]
+  }));
+  const selection = state.oversightSchool || 'all';
+  const rows = selection === 'all' ? records : records.filter(s => s.id === selection);
+  const sum = key => rows.reduce((n,s) => n+s[key],0);
+  const pct = (a,b) => b ? (a/b*100).toFixed(1) : '0.0';
+  const enrolled=sum('students'), present=sum('present'), staff=sum('teachers'), onSite=sum('staffPresent');
+  const candidates=sum('candidates'), passed=sum('passed'), eligible=sum('eligible'), promoted=sum('promoted');
+  const kpi = (label,value,note,tone,glyph) => `<article class="exec-kpi ${tone}"><span>${icon(glyph,19)} ${label}</span><strong>${value}</strong><small>${note}</small></article>`;
+  const card = (label,title,body,extra='') => `<section class="exec-panel ${extra}"><header><span>${label}</span><h2>${title}</h2></header>${body}</section>`;
+  const short = s => s.id === 'secondary' ? 'Secondary Demo' : s.name.replace(' Smart School','');
+  const rate = s => Number(pct(s.passed,s.candidates));
+  const signal = s => rate(s)<70 || Number(pct(s.staffPresent,s.teachers))<90 ? ['priority','Needs attention'] : rate(s)<80 || Number(pct(s.present,s.students))<95 || Number(pct(s.promoted,s.eligible))<90 ? ['watch','Needs improvement'] : ['good','Working well'];
+  const lines = rows.map((s,i) => { const points=s.trend.map((v,j)=>`${55+j*62},${210-(v-80)*8}`).join(' '); return `<polyline points="${points}" fill="none" stroke="${['#1765bf','#14957f','#af651f'][records.indexOf(s)]}" stroke-width="3"/>${s.trend.map((v,j)=>`<circle cx="${55+j*62}" cy="${210-(v-80)*8}" r="4" fill="${['#1765bf','#14957f','#af651f'][records.indexOf(s)]}"><title>${short(s)} · Week ${j+1}: ${v}%</title></circle>`).join('')}`; }).join('');
+  return `<div class="exec-heading"><div><span>EDUCATION PERFORMANCE BRIEFING</span><h2>See the signals. Shape the next step.</h2><p>School participation, learning outcomes and progression in one decision view.</p></div><label for="oversight-school">School coverage<select id="oversight-school"><option value="all">All schools</option>${records.map(s=>`<option value="${s.id}" ${selection===s.id?'selected':''}>${s.name}</option>`).join('')}</select></label></div><div class="exec-context">${icon('info',17)} Fictional demonstration data · Attendance: 21 October 2026 · Exams and promotions: completed 2025/26 cycle · Enrolment: Term 1, 2026/27</div><div class="exec-kpis">${kpi('Enrolment',fmt(enrolled),`${pct(enrolled-sum('previous'),sum('previous'))}% growth vs previous term`,'blue','users-three')}${kpi('Student attendance',pct(present,enrolled)+'%',`${fmt(present)} present / ${fmt(enrolled-present)} absent`,'blue','student')}${kpi('Teacher attendance',pct(onSite,staff)+'%',`${onSite} present / ${staff-onSite} absent`,'teal','chalkboard-teacher')}${kpi('Exam pass rate',pct(passed,candidates)+'%',`${passed} passed / ${candidates-passed} failed · ${candidates} sat`,'gold','exam')}${kpi('Promotion rate',pct(promoted,eligible)+'%',`${promoted} promoted / ${eligible-promoted} retained`,'violet','trend-up')}${kpi('Schools in view',rows.length,`${sum('teachers')} teachers · ${fmt(sum('devices'))} devices`,'blue','buildings')}</div><div class="exec-main-grid">${card('PARTICIPATION OVER TIME','Student attendance · last 8 weeks',`<div class="exec-chart-key">${rows.map(s=>`<span><i style="background:${['#1765bf','#14957f','#af651f'][records.indexOf(s)]}"></i>${short(s)}</span>`).join('')}<span class="exec-target-key">Target 95%</span></div><svg class="exec-trend" viewBox="0 0 550 255" role="img" aria-label="Weekly student attendance percentages by school, weeks one to eight; target 95 percent">${[80,85,90,95,100].map(v=>`<line x1="48" y1="${210-(v-80)*8}" x2="505" y2="${210-(v-80)*8}" stroke="#dce5ef"/><text x="6" y="${215-(v-80)*8}" font-size="11" fill="#657c91">${v}%</text>`).join('')}<line x1="48" y1="90" x2="505" y2="90" stroke="#a36d22" stroke-dasharray="5 5"/>${lines}${Array.from({length:8},(_,i)=>`<text x="${55+i*62}" y="240" text-anchor="middle" font-size="11" fill="#657c91">W${i+1}</text>`).join('')}</svg><details><summary>View attendance figures</summary><div class="exec-table-wrap"><table><thead><tr><th>School</th>${Array.from({length:8},(_,i)=>`<th>W${i+1}</th>`).join('')}</tr></thead><tbody>${rows.map(s=>`<tr><td>${short(s)}</td>${s.trend.map(v=>`<td>${v}%</td>`).join('')}</tr>`).join('')}</tbody></table></div></details><p class="exec-footnote">Weekly rates are illustrative. The daily snapshot above may differ from weekly averages.</p>`)}${card('LATEST COMPLETED EXAM CYCLE','Exam outcomes by school',`<div class="exec-chart-key"><span><i style="background:#14957f"></i>Passed</span><span><i style="background:#cc655c"></i>Failed</span></div>${rows.map(s=>`<div class="exec-outcome"><div><b>${short(s)}</b><strong>${pct(s.passed,s.candidates)}% pass</strong></div><div class="exec-stack" role="img" aria-label="${short(s)}: ${s.passed} passed, ${s.candidates-s.passed} failed"><i style="width:${pct(s.passed,s.candidates)}%"></i><em style="width:${pct(s.candidates-s.passed,s.candidates)}%"></em></div><small>${s.passed} passed · ${s.candidates-s.passed} failed · ${s.candidates} candidates</small></div>`).join('')}<p class="exec-footnote">Demo benchmark: 80% of candidates passing. Pass = overall exam score of at least 50%.</p>`)}${card('ACCESS & GROWTH','Enrolment by school',`<div class="exec-chart-key"><span><i style="background:#b7cce3"></i>Previous term</span><span><i style="background:#1765bf"></i>Current term</span></div>${rows.map(s=>`<div class="exec-enrol"><div><b>${short(s)}</b><strong>+${s.students-s.previous}</strong></div><div><i style="width:${s.previous/700*100}%">${s.previous}</i></div><div><em style="width:${s.students/700*100}%">${s.students}</em></div></div>`).join('')}<p class="exec-footnote">Bar scale: 0–700 learners. Growth describes participation, rather than learning quality.</p>`)}${card('PROGRESSION THROUGH SCHOOL','Promotions & retention',`<div class="exec-promotion-total"><strong>${pct(promoted,eligible)}%</strong><span>promoted from ${fmt(eligible)} eligible learners</span></div>${rows.map(s=>`<div class="exec-outcome"><div><b>${short(s)}</b><strong>${pct(s.promoted,s.eligible)}%</strong></div><div class="exec-stack"><i style="width:${pct(s.promoted,s.eligible)}%"></i><em style="width:${pct(s.eligible-s.promoted,s.eligible)}%"></em></div><small>${s.promoted} promoted · ${s.eligible-s.promoted} retained</small></div>`).join('')}<p class="exec-footnote">Eligible cohort excludes terminal-year and newly admitted learners. Demo progression benchmark: 90%.</p>`)}</div>${card('CROSS-SCHOOL SCORECARD','Where support is needed',`<div class="exec-table-wrap"><table><thead><tr><th>School</th><th>Enrolment</th><th>Students present</th><th>Teachers present</th><th>Exam pass</th><th>Promoted</th><th>Signal</th></tr></thead><tbody>${rows.map(s=>{const [tone,label]=signal(s);return `<tr><td><b>${short(s)}</b><small>${s.type}</small></td><td>${s.students}</td><td>${pct(s.present,s.students)}%<small>${s.present}/${s.students}</small></td><td>${pct(s.staffPresent,s.teachers)}%<small>${s.staffPresent}/${s.teachers}</small></td><td>${pct(s.passed,s.candidates)}%</td><td>${pct(s.promoted,s.eligible)}%</td><td><span class="exec-signal ${tone}">${label}</span></td></tr>`}).join('')}</tbody></table></div><p class="exec-footnote">Signals: attention if exam pass &lt;70% or teacher attendance &lt;90%; improvement if pass &lt;80%, student attendance &lt;95%, or promotion &lt;90%; otherwise working well. These are demo thresholds.</p>`,'exec-scorecard')}<section class="exec-actions"><header><span>FROM EVIDENCE TO ACTION</span><h2>What should happen next?</h2></header><div>${rows.map(s=>{const [tone,label]=signal(s);return `<article class="${tone}"><span class="exec-signal ${tone}">${label}</span><h3>${short(s)}</h3><p>${s.id==='ubakala'?'Exam pass is 86.7% and promotion is 93.0%: a strong learning signal. Student attendance is 94.0%, just below the 95% target.':s.id==='umuomaikwu'?'Teacher attendance is 89.5% and exam pass is 75.0%. Teaching coverage and learner support both warrant review.':'Exam pass is 65.0%, with 42 candidates failing. Student attendance is 88.9% and promotion is 81.9%, indicating several areas needing support.'}</p><b>${s.id==='ubakala'?'Improve attendance':'Priority follow-up'}</b><p>${s.id==='ubakala'?'Review recurring absences and share effective learning practices with the other schools.':s.id==='umuomaikwu'?'Verify teacher absence reasons, arrange lesson coverage and plan targeted support for failed candidates.':'Request a school improvement review, investigate missed learning time and agree a subject-level recovery plan.'}</p><small>Suggested owner: ${s.id==='ubakala'?'Headteacher':s.id==='umuomaikwu'?'School administrator & academic lead':'Principal & oversight lead'} · Review at the next weekly briefing</small></article>`}).join('')}</div></section>`;
+}
+
+function dashboardQuickActions(kind) {
+  const teacher = kind === "teacherdash";
+  const workspace = teacher ? "teacher" : "school";
+  const actions = teacher ? [
+    ["attendance-register", "check-square-offset", "Mark attendance", "Open your class register"],
+    ["lesson-planner", "notebook", "Plan a lesson", "Prepare your next class"],
+    ["assignments", "clipboard-text", "Review assignments", "Continue your marking"],
+    ["virtual-lab", "flask", "Manage virtual lab", "Guide practical learning"],
+    ["gradebook", "notepad", "Open gradebook", "Review learner results"],
+    ["learning-resources", "books", "Find resources", "Support your next lesson"],
+  ] : [
+    ["attendance", "calendar-check", "Review attendance", "Check learners and staff"],
+    ["admissions", "user-plus", "Manage admissions", "Review incoming learners"],
+    ["classes-subjects", "chalkboard-teacher", "Classes & subjects", "Review teaching coverage"],
+    ["examinations-results", "exam", "Exams & results", "Track assessment readiness"],
+    ["communication-centre", "chats-circle", "Communications", "Open school messages"],
+    ["school-reports", "chart-bar", "View reports", "Review school performance"],
+  ];
+  return `<section class="dash-quick-actions"><header><div><span>YOUR DAILY TOOLKIT</span><h2>What would you like to do?</h2></div><p>${teacher ? "Less searching. More time for teaching." : "Keep the school day moving."}</p></header><nav aria-label="${teacher ? "Teacher" : "School management"} quick actions">${actions.map(([path,glyph,title,desc])=>`<a href="#/${workspace}/${path}"><span>${icon(glyph,23)}</span><div><b>${title}</b><small>${desc}</small></div>${icon("arrow-right",16)}</a>`).join("")}</nav></section>`;
+}
 function renderKind(kind) {
   const s = currentSchool(),
     secondary = state.mode === "secondary",
     teacherWorkspace = location.hash.includes("/teacher/");
   const k = {
+    teacherlab: () => teacherLab(),
+    virtuallab: () => virtualLab(),
     executive: () =>
       `<div class="stats">${stat("Schools in view", "3", "1 planned")}${stat("Learners", fmt(total("students")), "6.8%")}${stat("Average attendance", "91.3%", "1.6%")}${stat("Learning pulse", "74.3", "3.1 pts")}</div><div class="grid two">${panel("Portfolio performance", "TERM-ON-TERM", `<div class="chart-area"><div class="chart-bars">${[54, 62, 58, 71, 68, 78, 74, 84].map((v, i) => `<i style="height:${v}%"><span>${["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8"][i]}</span></i>`).join("")}</div></div><div class="legend"><span><i class="blue"></i>Learning engagement</span><span><i class="mint"></i>Attendance</span></div>`)}${panel("Leadership attention", "PRIORITISED", `<div class="alerts"><article class="alert warm"><b>12 devices awaiting checks</b><span>Umuomaikwu · ICT follow-up</span><em>Medium</em></article><article class="alert"><b>Attendance recovery</b><span>Basic 4 improved 4.2 points</span><em>Positive</em></article><article class="alert purple"><b>Curriculum coverage</b><span>3 classes below weekly target</span><em>Review</em></article></div>`)}</div><div class="school-strip">${schools.map((x) => schoolCard(x)).join("")}</div>`,
     schools: () =>
@@ -1644,8 +1743,7 @@ function renderKind(kind) {
             `<article class="${x[4]}"><span>${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p><small>${x[3]}</small></article>`,
         )
         .join("")}</div>`,
-    oversight: () =>
-      `<div class="oversight-hero"><div><span>AUTHORISED AGGREGATE VIEW</span><h2>Three schools.<br>One clear picture.</h2><p>No private learner records are shown in this workspace.</p></div><div class="map-dots"><i></i><i></i><i></i><span>Abia State</span></div></div><div class="stats">${stat("Schools", "3", "2 primary · 1 secondary")}${stat("Learners", "1,482", "6.8%")}${stat("Attendance", "91.3%", "1.6%")}${stat("Learning benchmark", "74.3%", "3.1 pts")}</div><div class="grid two">${panel("System momentum", "TERM-ON-TERM", `<div class="big-spark">${miniChart([61, 64, 67, 66, 71, 73, 74, 78])}</div><div class="axis"><span>Term 1 2025</span><span>Term 1 2026</span></div>`)}${panel("Briefing notes", "ILLUSTRATIVE HIGHLIGHTS", `<div class="checklist"><p><i>${icon("trend", 17)}</i><span><b>Enrolment growth</b>6.8% across the portfolio</span></p><p><i>${icon("trend", 17)}</i><span><b>Attendance recovery</b>1.6 points term-on-term</span></p><p><i>${icon("alert", 17)}</i><span><b>Infrastructure</b>12 devices due for checks</span></p></div>`)}</div>`,
+    oversight: () => stakeholderDashboard(),
     enrolment: () =>
       `<div class="stats">${stat("Total enrolment", "1,482", "6.8%")}${stat("Primary", "858", "58%")}${stat("Secondary", "624", "42%")}${stat("Girls", "756", "51%")}</div><div class="grid two">${panel("Five-term enrolment", "AGGREGATE TREND", `<div class="big-spark">${miniChart([1180, 1244, 1308, 1387, 1482], "#12aa98")}</div><div class="axis"><span>2025 T1</span><span>2026 T1</span></div>`)}${panel(
         "Current level mix",
@@ -1676,7 +1774,12 @@ function renderKind(kind) {
     outcomes: () =>
       `<div class="stats">${stat("Learning benchmark", "74.3%", "3.1 pts")}${stat("Literacy", "76.8%", "2.7 pts")}${stat("Numeracy", "72.4%", "3.8 pts")}${stat("Learners improving", "68%", "5 pts")}</div>${panel("Outcome comparison", "AGGREGATE SCHOOL DATA", `<div class="outcome-chart">${schools.map((x, i) => `<article><span>${x.name}</span><div><i style="width:${x.performance}%"></i><b>${x.performance}%</b></div><small>${["+4.2", "+2.8", "+2.1"][i]} points term-on-term</small></article>`).join("")}</div>`)}<div class="grid two">${panel("Subject lens", "PORTFOLIO AVERAGE", `${progress("English / Literacy", 77)}${progress("Mathematics / Numeracy", 72)}${progress("Basic Science", 75)}${progress("Social Studies", 73)}`)}${panel("Interpretation note", "RESPONSIBLE USE", `<p class="body-copy">Aggregate results are one signal among many. Future production reporting should include cohort context, assessment quality and appropriate data-governance review.</p><div class="notice compact">No individual pupil detail is exposed here.</div>`)}</div>`,
   };
-  const content = (k[kind] || k.executive)() + dashboardSupplement(kind);
+  let primary = (k[kind] || k.executive)();
+  if (["schooldash", "teacherdash"].includes(kind)) {
+    primary = primary.replace('<div class="stats">', dashboardQuickActions(kind) + '<div class="stats">');
+    if (kind === "teacherdash") primary = primary.replace(button("Open lesson", true), '<a class="dash-open-lesson" href="#/teacher/lesson-planner">Open lesson ' + icon("arrow-right",16) + '</a>');
+  }
+  const content = primary + (kind === "oversight" ? "" : dashboardSupplement(kind));
   return route().ws?.id === "student" ? studentGuide(kind) + content : content;
 }
 
@@ -1724,7 +1827,7 @@ const presentationSlides = [
     title: "Built around people—not software modules.",
     copy: "Six purpose-built workspaces keep each audience focused while the platform keeps the institution connected.",
     layout: "workspaces",
-    body: `<div class="workspace-orbit"><div class="orbit-centre"><b>BlueLMS</b><span>59 connected screens</span></div>${workspaces.map((w, i) => `<div class="orbit-workspace ow${i}"><i>${icon(w.icon, 23)}</i><span><b>${w.label}</b><small>${w.audience}</small></span></div>`).join("")}</div>`,
+    body: `<div class="workspace-orbit"><div class="orbit-centre"><b>BlueLMS</b><span>61 connected screens</span></div>${workspaces.map((w, i) => `<div class="orbit-workspace ow${i}"><i>${icon(w.icon, 23)}</i><span><b>${w.label}</b><small>${w.audience}</small></span></div>`).join("")}</div>`,
   },
   {
     kicker: "WHAT MAKES BLUELMS POWERFUL",
@@ -1771,7 +1874,7 @@ function presentation(slide) {
   return `<main class="presentation slide-${s.layout}" data-slide="${slide + 1}"><header><a href="#/presentation/1" class="brand"><div class="brand-mark light"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>Management presentation</span></div></a><div class="presentation-tools"><span>${String(slide + 1).padStart(2, "0")} / 06</span><button id="fullscreenPresentation" aria-label="Enter full-screen presentation">${icon("monitor", 18)} <em>Full screen</em></button></div></header><section class="presentation-stage"><div class="presentation-copy"><span>${s.kicker}</span><h1>${s.title}</h1><p>${s.copy}</p>${final ? `<a class="enter-demo" href="#/demo">Enter Demo Mode ${icon("arrow", 19)}</a>` : ""}</div><div class="presentation-visual">${final ? qrInvite() : s.body}</div></section><footer><nav aria-label="Presentation sections">${presentationSlides.map((x, i) => `<a href="#/presentation/${i + 1}" class="${i === slide ? "active" : ""}" aria-label="${x.kicker}"><i></i><span>${x.kicker}</span></a>`).join("")}</nav><div><a class="slide-control ${slide === 0 ? "disabled" : ""}" href="#/presentation/${Math.max(1, slide)}" aria-label="Previous section">${icon("left", 18)}</a><a class="slide-control ${final ? "disabled" : ""}" href="#/presentation/${Math.min(6, slide + 2)}" aria-label="Next section">${icon("arrow", 18)}</a></div></footer><div class="toast" id="toast">Link copied.</div></main>`;
 }
 function welcome() {
-  return `<main class="welcome"><nav><div class="brand"><div class="brand-mark"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>by Blue Giraffe Development</span></div></div>${demoTag("Product vision demo")}</nav><section class="welcome-hero"><div><span class="overline">BUILT FOR THE WAY SCHOOLS REALLY WORK</span><h1>One learning platform.<br><em>Every school day.</em></h1><p>Explore a connected vision for learning, teaching, school operations and responsible oversight—designed for Nigerian schools.</p><div class="welcome-actions"><a href="#/bgdl/executive-overview">Enter the experience <b>${icon("arrow", 18)}</b></a><button id="openIndex">View 59-screen index</button></div><small>All people, records and statistics are fictional demonstration data.</small></div><div class="welcome-illustration">${illustration("ecosystem", "BlueLMS connecting schools, teaching, learning and management")}</div></section><section class="workspace-launch"><header><span>EXPLORE BY WORKSPACE</span><h2>Six perspectives. One connected platform.</h2></header><div>${workspaces.map((w, i) => `<a href="#/${w.id}/${w.pages[0].path}" class="launch-card ${w.tone}"><span>0${i + 1}</span><i>${icon(w.icon, 22)}</i><h3>${w.label}</h3><p>${w.audience}</p><b>Explore workspace ${icon("arrow", 16)}</b></a>`).join("")}</div></section><footer><span>BlueLMS NextGen · Management demonstration · October 2026</span><b>Built by BGDL</b></footer></main>`;
+  return `<main class="welcome"><nav><div class="brand"><div class="brand-mark"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>by Blue Giraffe Development</span></div></div>${demoTag("Product vision demo")}</nav><section class="welcome-hero"><div><span class="overline">BUILT FOR THE WAY SCHOOLS REALLY WORK</span><h1>One learning platform.<br><em>Every school day.</em></h1><p>Explore a connected vision for learning, teaching, school operations and responsible oversight—designed for Nigerian schools.</p><div class="welcome-actions"><a href="#/bgdl/executive-overview">Enter the experience <b>${icon("arrow", 18)}</b></a><button id="openIndex">View 61-screen index</button></div><small>All people, records and statistics are fictional demonstration data.</small></div><div class="welcome-illustration">${illustration("ecosystem", "BlueLMS connecting schools, teaching, learning and management")}</div></section><section class="workspace-launch"><header><span>EXPLORE BY WORKSPACE</span><h2>Six perspectives. One connected platform.</h2></header><div>${workspaces.map((w, i) => `<a href="#/${w.id}/${w.pages[0].path}" class="launch-card ${w.tone}"><span>0${i + 1}</span><i>${icon(w.icon, 22)}</i><h3>${w.label}</h3><p>${w.audience}</p><b>Explore workspace ${icon("arrow", 16)}</b></a>`).join("")}</div></section><footer><span>BlueLMS NextGen · Management demonstration · October 2026</span><b>Built by BGDL</b></footer></main>`;
 }
 function shell(ws, page) {
   const visiblePages = ws.pages.filter((p) =>
@@ -1815,6 +1918,10 @@ function render() {
   bind();
 }
 function bind() {
+  const oversightFilter = $("#oversight-school");
+  if (oversightFilter) oversightFilter.onchange = e => { state.oversightSchool = e.target.value; render(); };
+  bindTeacherLab();
+  bindVirtualLab();
   const activeRoute = route();
   if (activeRoute.page) {
     $(".page")?.classList.add(
@@ -1962,4 +2069,9 @@ document.onkeydown = (e) => {
   if (e.key === "End") location.hash = "/presentation/6";
 };
 window.addEventListener("hashchange", render);
+window.addEventListener("storage", event => {
+  const kind = route().page?.kind;
+  if ((event.key === "bluelms-lab-activity" && kind === "teacherlab") ||
+      (event.key === "bluelms-lab-session" && ["teacherlab", "virtuallab"].includes(kind))) render();
+});
 render();

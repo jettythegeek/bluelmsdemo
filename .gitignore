@@ -1,4 +1,8 @@
 node_modules/
+.vercel/
+.env
+.env.*
+!.env.example
 screenshots/v6-*.png
 screenshots/*-fix.png
 screenshots/student-v8-*.png

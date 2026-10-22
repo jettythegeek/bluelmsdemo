@@ -5,13 +5,13 @@ for (const file of ["index.html", "styles.css", "app.js"])
   if (!fs.existsSync(path.join(root, file))) throw new Error(`Missing ${file}`);
 const js = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const count = (js.match(/path:/g) || []).length;
-if (count !== 59) throw new Error(`Expected 59 routes, found ${count}`);
+if (count !== 61) throw new Error(`Expected 61 routes, found ${count}`);
 const paths = [
   ...js.matchAll(
     /\{\s*path:\s*["']([^"']+)["'],\s*title:\s*["']([^"']+)["'],\s*desc:\s*["']([^"']+)["'],\s*kind:\s*["']([^"']+)["'],?\s*\}/gs,
   ),
 ].map((m) => ({ path: m[1], title: m[2], desc: m[3], kind: m[4] }));
-if (paths.length !== 59)
+if (paths.length !== 61)
   throw new Error(`Could not parse all route records: ${paths.length}`);
 if (paths.some((p) => !p.title || !p.desc || !p.kind))
   throw new Error("A route is missing content metadata");

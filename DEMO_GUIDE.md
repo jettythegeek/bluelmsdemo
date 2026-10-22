@@ -33,4 +33,4 @@ Open **Oversight Overview**, then **Learning Outcomes**. Point out that this wor
 - Use the provided routes in this order and avoid improvising operational actions.
 - Keep a built `dist/` copy available locally; no internet connection is required for core rendering.
 - If asked whether a control works, say: “This prototype validates the experience. Production workflows follow technical and safeguarding validation.”
-- Use the in-app **59 screens** button when management asks about breadth.
+- Use the in-app **61 screens** button when management asks about breadth.
