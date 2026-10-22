@@ -244,67 +244,67 @@ const workspaces = [
       {
         path: "learning-home",
         title: "Learning Home",
-        desc: "A personal starting point for today’s learning.",
+        desc: "See what you can learn and enjoy today.",
         kind: "studentdash",
       },
       {
         path: "my-subjects",
         title: "My Subjects",
-        desc: "Subjects, teachers and progress at a glance.",
+        desc: "Choose a subject and continue where you stopped.",
         kind: "subjects",
       },
       {
         path: "lesson-viewer",
         title: "Lesson Viewer",
-        desc: "A rich, structured sample lesson with an offline state.",
+        desc: "Learn one small step at a time.",
         kind: "lesson",
       },
       {
         path: "assignments",
         title: "Assignments",
-        desc: "Due work, completed tasks and teacher feedback.",
+        desc: "See what to do next and what you have finished.",
         kind: "assignments",
       },
       {
         path: "tests-exams",
         title: "Tests & Exams",
-        desc: "Upcoming assessments and readiness guidance.",
+        desc: "Know what is coming and practise before the day.",
         kind: "studenttests",
       },
       {
         path: "results-progress",
         title: "Results & Progress",
-        desc: "Marks, trends, feedback and next steps.",
+        desc: "Celebrate your progress and see what to practise next.",
         kind: "progress",
       },
       {
         path: "learning-library",
         title: "Learning Library",
-        desc: "Curriculum resources available for study.",
+        desc: "Find stories, videos and activities you will enjoy.",
         kind: "library",
       },
       {
         path: "ai-learning-buddy",
         title: "AI Learning Buddy",
-        desc: "A safe, scripted worked example—not a live chat.",
+        desc: "Get a simple explanation when a lesson feels hard.",
         kind: "studentai",
       },
       {
         path: "achievements",
         title: "Achievements",
-        desc: "Milestones that celebrate steady learning.",
+        desc: "See the badges you earned by learning and trying.",
         kind: "achievements",
       },
       {
         path: "timetable",
         title: "Timetable",
-        desc: "The day and week ahead, clearly organised.",
+        desc: "See your lessons for today and the rest of the week.",
         kind: "studenttime",
       },
       {
         path: "offline-downloads",
         title: "Offline Downloads",
-        desc: "Illustrative cached lessons and pending sync states.",
+        desc: "Keep learning when there is no internet.",
         kind: "offline",
       },
     ],
@@ -777,6 +777,151 @@ function dashboardSupplement(kind) {
     oversight: `<section class="oversight-board"><article class="viz-panel outcome-matrix"><header><span>LEARNING OUTCOMES</span><h2>School by subject</h2></header><div class="matrix"><b></b>${["Maths", "English", "Science"].map((x) => `<b>${x}</b>`).join("")}${schools.map((s, i) => `<strong>${s.name.split(" ")[0]}</strong>${[s.performance, s.performance + 3, s.performance - 2].map((v) => `<i style="--score:${v}%">${v}</i>`).join("")}`).join("")}</div></article><article class="viz-panel enrolment-donut"><header><span>ENROLMENT DISTRIBUTION</span><h2>1,482 learners</h2></header>${donut(58, "primary")}<p>858 primary · 624 secondary</p></article><article class="viz-panel infrastructure-bars"><header><span>INFRASTRUCTURE READINESS</span><h2>By school</h2></header>${schools.map((s) => progress(s.name, Math.round((s.devices / s.students) * 300), `${s.devices} devices`)).join("")}</article><article class="executive-preview"><span>EXECUTIVE REPORTING</span><h2>Term 1 system briefing</h2><p>Performance, attendance, enrolment and infrastructure signals—prepared as an aggregate preview.</p><button data-preview="true">Open report preview</button></article></section>`,
   };
   return supplements[kind] || "";
+}
+
+function studentGuide(kind) {
+  const score = 78;
+  const messages = {
+    studentdash: [
+      "Hi Amara! Ready for a bright day?",
+      "You have three learning adventures today. Start with the one that feels right.",
+      "rocket-launch",
+    ],
+    subjects: [
+      "What would you like to learn, Amara?",
+      "Pick a subject to see your lessons, activities and next small goal.",
+      "books",
+    ],
+    lesson: [
+      "Let’s learn this together, Amara.",
+      "Take your time. You can pause, try an example and come back whenever you need to.",
+      "pencil-simple",
+    ],
+    assignments: [
+      "Amara, you have two tasks to finish.",
+      "Do one step at a time. Your fraction journal is due first.",
+      "notebook",
+    ],
+    studenttests: [
+      "Amara, you have two upcoming tests.",
+      "Your next test is Mathematics. A short practice today will help you feel ready.",
+      "exam",
+    ],
+    progress:
+      score >= 70
+        ? [
+            "You’re doing well, Amara!",
+            `Your learning score is ${score}%. Keep practising and be proud of every step.`,
+            "trophy",
+          ]
+        : [
+            "Keep going, Amara. You can improve.",
+            "Try one short lesson today and ask your teacher when you need help.",
+            "plant",
+          ],
+    library: [
+      "What will you discover today, Amara?",
+      "Choose a story, a science idea or a fun number activity.",
+      "book-open",
+    ],
+    studentai: [
+      "Need a little help, Amara?",
+      "Your Learning Buddy can explain one step at a time using easy words.",
+      "robot",
+    ],
+    achievements: [
+      "Look how far you’ve come, Amara!",
+      "You earned eight badges. Every badge shows something new you can do.",
+      "medal",
+    ],
+    studenttime: [
+      "Here is your school day, Amara.",
+      "Your next lesson is Mathematics at 9:20. You have time to get ready.",
+      "clock-countdown",
+    ],
+    offline: [
+      "Your lessons can travel with you, Amara.",
+      "Twenty-six lessons are ready on this device, even when there is no internet.",
+      "laptop",
+    ],
+  };
+  const message = messages[kind];
+  if (!message) return "";
+  const motifs = [
+    "pencil-simple",
+    "pen-nib",
+    "books",
+    "laptop",
+    "flask",
+    "rocket-launch",
+    "medal",
+    "trophy",
+  ];
+  return `<section class="student-guide"><div class="student-guide-copy"><span>YOUR LEARNING SPACE</span><h2>${message[0]}</h2><p>${message[1]}</p></div><i class="student-guide-main">${icon(message[2], 34)}</i><div class="student-motifs" aria-hidden="true">${motifs.map((name) => icon(name, 22)).join("")}</div></section>`;
+}
+
+function personalizeStudentCopy(kind) {
+  const set = (selector, text, html = false) => {
+    const el = $(selector);
+    if (!el) return;
+    if (html) el.innerHTML = text;
+    else el.textContent = text;
+  };
+  if (kind === "subjects") set(".panel-head h2", "Amara’s subjects");
+  if (kind === "assignments") set(".panel-head h2", "Your tasks, Amara");
+  if (kind === "studenttests") {
+    set(".test-hero h2", "Amara, two tests are coming up.");
+    set(
+      ".test-hero p",
+      "Mathematics is first. Try one short practice today and you will feel more ready.",
+    );
+    set(".test-hero>div:last-child b", "Your next test");
+    document.querySelectorAll(".test-grid article>div i").forEach((el) => {
+      el.outerHTML = icon("clock-countdown", 17);
+    });
+    document
+      .querySelectorAll(".test-grid article small")
+      .forEach(
+        (el) => (el.textContent = "Ask your teacher if anything is unclear."),
+      );
+    document.querySelectorAll(".test-grid .preview-btn").forEach((el) => {
+      el.childNodes[0].textContent = "See what to practise";
+    });
+  }
+  if (kind === "progress") {
+    set(".progress-hero h2", "You’re doing well, Amara!");
+    set(
+      ".progress-hero p",
+      "Your score is 78%. Keep practising and be proud of every step you take.",
+    );
+    set(".progress-hero strong small", "your score");
+  }
+  if (kind === "library") {
+    set(".library-hero h2", "Pick something fun, Amara.");
+    set(
+      ".library-hero p",
+      "Read a story, watch a short science video or try a number activity.",
+    );
+  }
+  if (kind === "studentai") {
+    set(".buddy aside h2", "Let’s solve it together, Amara.");
+    set(
+      ".buddy aside>p",
+      "We will use easy words and take one small step at a time.",
+    );
+  }
+  if (kind === "achievements") {
+    set(".achievement-hero h2", "Great work,<br>Amara!", true);
+    set(".achievement-hero p", "You earned 8 badges this term.");
+  }
+  if (kind === "studenttime") set(".panel-head h2", "Amara’s Wednesday");
+  if (kind === "offline") {
+    set(".offline-hero h2", "Your lessons are ready, Amara.");
+    set(
+      ".offline-hero p",
+      "You can open these lessons even when there is no internet.",
+    );
+  }
 }
 
 function renderKind(kind) {
@@ -1531,7 +1676,8 @@ function renderKind(kind) {
     outcomes: () =>
       `<div class="stats">${stat("Learning benchmark", "74.3%", "3.1 pts")}${stat("Literacy", "76.8%", "2.7 pts")}${stat("Numeracy", "72.4%", "3.8 pts")}${stat("Learners improving", "68%", "5 pts")}</div>${panel("Outcome comparison", "AGGREGATE SCHOOL DATA", `<div class="outcome-chart">${schools.map((x, i) => `<article><span>${x.name}</span><div><i style="width:${x.performance}%"></i><b>${x.performance}%</b></div><small>${["+4.2", "+2.8", "+2.1"][i]} points term-on-term</small></article>`).join("")}</div>`)}<div class="grid two">${panel("Subject lens", "PORTFOLIO AVERAGE", `${progress("English / Literacy", 77)}${progress("Mathematics / Numeracy", 72)}${progress("Basic Science", 75)}${progress("Social Studies", 73)}`)}${panel("Interpretation note", "RESPONSIBLE USE", `<p class="body-copy">Aggregate results are one signal among many. Future production reporting should include cohort context, assessment quality and appropriate data-governance review.</p><div class="notice compact">No individual pupil detail is exposed here.</div>`)}</div>`,
   };
-  return (k[kind] || k.executive)() + dashboardSupplement(kind);
+  const content = (k[kind] || k.executive)() + dashboardSupplement(kind);
+  return route().ws?.id === "student" ? studentGuide(kind) + content : content;
 }
 
 function schoolCard(x, large = false) {
@@ -1676,6 +1822,8 @@ function bind() {
       `workspace-${activeRoute.ws.id}`,
     );
     $(".app-shell")?.classList.add(`workspace-shell-${activeRoute.ws.id}`);
+    if (activeRoute.ws.id === "student")
+      personalizeStudentCopy(activeRoute.page.kind);
   }
   const screenTotal = workspaces.reduce((n, w) => n + w.pages.length, 0);
   const openIndex = $("#openIndex");
