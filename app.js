@@ -507,7 +507,42 @@ const iconPaths = {
     '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
 };
 function icon(name, size = 18) {
-  return `<svg class="lucide" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${iconPaths[name] || iconPaths.chart}</svg>`;
+  const aliases = {
+    "layout-dashboard": "squares-four",
+    school: "buildings",
+    presentation: "presentation-chart",
+    "graduation-cap": "student",
+    users: "users-three",
+    chart: "chart-line-up",
+    trend: "trend-up",
+    search: "magnifying-glass",
+    bell: "bell",
+    menu: "list",
+    home: "house",
+    switch: "arrows-left-right",
+    chevron: "caret-right",
+    left: "caret-left",
+    close: "x",
+    arrow: "arrow-right",
+    more: "dots-three",
+    check: "check-circle",
+    alert: "warning",
+    tablet: "device-tablet",
+    spark: "sparkle",
+    file: "file-text",
+    link: "link",
+    play: "play-circle",
+    download: "download-simple",
+    refresh: "arrows-clockwise",
+    award: "medal",
+    book: "book-open-text",
+    calculator: "calculator",
+    flask: "flask",
+    palette: "palette",
+    monitor: "monitor",
+  };
+  const glyph = aliases[name] || name || "circle";
+  return `<i class="ph ph-${glyph}" style="font-size:${size}px" aria-hidden="true"></i>`;
 }
 function brandLogo(cls = "") {
   return `<span class="bgdl-logo-frame ${cls}"><img class="bgdl-logo" src="assets/bgdl-logo.png" alt="Blue Giraffe Development Limited"/></span>`;
@@ -552,21 +587,65 @@ function metricIcon(label) {
   return "chart";
 }
 function navIcon(label) {
-  const x = label.toLowerCase();
-  if (x.includes("dashboard") || x.includes("overview")) return "layout-dashboard";
-  if (x.includes("school")) return "school";
-  if (x.includes("student") || x.includes("learner") || x.includes("children")) return "graduation-cap";
-  if (x.includes("staff") || x.includes("teacher")) return "presentation";
-  if (x.includes("attendance") || x.includes("register")) return "check";
-  if (x.includes("device") || x.includes("infrastructure") || x.includes("offline")) return "tablet";
-  if (x.includes("ai") || x.includes("buddy")) return "spark";
-  if (x.includes("resource") || x.includes("library") || x.includes("lesson") || x.includes("subject")) return "book";
-  if (x.includes("message") || x.includes("communication") || x.includes("announcement")) return "bell";
-  if (x.includes("report") || x.includes("result") || x.includes("analytics") || x.includes("outcome") || x.includes("progress")) return "chart";
-  if (x.includes("settings") || x.includes("support")) return "monitor";
-  if (x.includes("calendar") || x.includes("timetable")) return "file";
-  if (x.includes("assignment") || x.includes("test") || x.includes("exam") || x.includes("question")) return "file";
-  return "book";
+  return (
+    {
+      "Executive Overview": "gauge",
+      "Schools Directory": "buildings",
+      "School Profile": "identification-card",
+      "Users & Roles": "user-gear",
+      "Cross-School Analytics": "chart-scatter",
+      "Attendance Intelligence": "pulse",
+      "Devices & Connectivity": "devices",
+      "AI Management Insights": "brain",
+      "Content Distribution": "cloud-arrow-down",
+      "Support & Integrations": "plugs-connected",
+      "Platform Settings": "sliders-horizontal",
+      "School Overview": "house-line",
+      Admissions: "user-plus",
+      "Student Directory": "address-book",
+      "Staff Directory": "users-four",
+      "Classes & Subjects": "chalkboard-teacher",
+      "Academic Calendar": "calendar-dots",
+      Timetable: "clock-countdown",
+      "Examinations & Results": "exam",
+      Attendance: "calendar-check",
+      "Assets & Maintenance": "toolbox",
+      "Communication Centre": "chats-circle",
+      "School Reports": "files",
+      "Teacher Dashboard": "chalkboard",
+      "My Classes": "users-three",
+      "Lesson Planner": "notebook",
+      "Scheme of Work": "list-checks",
+      "Learning Resources": "books",
+      Assignments: "clipboard-text",
+      "Tests & Question Bank": "question",
+      "Attendance Register": "check-square-offset",
+      Gradebook: "notepad",
+      "AI Teaching Assistant": "magic-wand",
+      Messages: "chat-teardrop-text",
+      "Learning Home": "rocket-launch",
+      "My Subjects": "book-bookmark",
+      "Lesson Viewer": "play-circle",
+      "Tests & Exams": "pencil-line",
+      "Results & Progress": "chart-line-up",
+      "Learning Library": "books",
+      "AI Learning Buddy": "robot",
+      Achievements: "trophy",
+      "Offline Downloads": "cloud-arrow-down",
+      "Family Overview": "heart",
+      "My Children": "users",
+      "Academic Progress": "trend-up",
+      "School Calendar": "calendar-heart",
+      Announcements: "megaphone",
+      "Oversight Overview": "binoculars",
+      Schools: "map-pin-area",
+      "Enrolment Analytics": "chart-donut",
+      "Learning Outcomes": "target",
+      "Attendance Trends": "chart-line",
+      "Infrastructure Status": "hard-drives",
+      "Executive Reports": "presentation-chart",
+    }[label.trim()] || "circle"
+  );
 }
 function stat(label, value, delta) {
   return `<article class="stat-card"><div class="metric-icon">${icon(metricIcon(label), 20)}</div><div class="stat-top"><span>${label}</span><i>${icon("trend", 14)} ${delta}</i></div><strong>${value}</strong></article>`;
@@ -608,12 +687,94 @@ const peopleRows = [
 
 function dashboardSupplement(kind) {
   const supplements = {
-    executive: `<section class="command-grid"><article class="viz-panel grouped-panel"><header><span>CROSS-SCHOOL COMPARISON</span><h2>Performance and attendance</h2></header><div class="grouped-bars">${schools.map((s) => `<div><span>${s.name.replace(' Smart School','')}</span><i style="--performance:${s.performance}%;--attendance:${s.attendance}%"><b></b><em></em></i><small>${s.performance}% learning · ${s.attendance}% attendance</small></div>`).join('')}</div></article><article class="viz-panel area-panel"><header><span>ENROLMENT MOMENTUM</span><h2>Five-term growth</h2></header><svg viewBox="0 0 520 210" role="img" aria-label="Enrolment area chart rising across five terms"><path class="area-fill" d="M20 178 L20 154 L135 130 L250 114 L365 75 L500 36 L500 178 Z"/><path class="area-line" d="M20 154 L135 130 L250 114 L365 75 L500 36"/><g>${[[20,154],[135,130],[250,114],[365,75],[500,36]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="5"/>`).join('')}</g></svg><div class="chart-axis"><span>2025 T1</span><span>2026 T1</span></div></article><article class="viz-panel connectivity-panel"><header><span>DEVICE CONNECTIVITY</span><h2>Fleet status</h2></header><div class="connectivity-layout">${donut(92,'online')}<div><p><i class="ready"></i><b>368</b> ready</p><p><i class="queue"></i><b>17</b> queued</p><p><i class="service"></i><b>12</b> service checks</p></div></div></article><article class="viz-panel ranking-panel"><header><span>SCHOOL PERFORMANCE RANKING</span><h2>Current term</h2></header>${[...schools].sort((a,b)=>b.performance-a.performance).map((s,i)=>`<p><b>0${i+1}</b><span>${s.name}<small>${s.attendance}% attendance</small></span><strong>${s.performance}</strong></p>`).join('')}</article></section>`,
-    schooldash: `<section class="operations-grid"><article class="viz-panel attendance-radial"><span>DAILY ATTENDANCE</span>${donut(94,'present')}<p><b>457 learners</b><small>29 absent · 6 follow-ups</small></p></article><article class="viz-panel class-population"><header><span>CLASS POPULATION</span><h2>Capacity today</h2></header>${[['Basic 1',84],['Basic 2',76],['Basic 3',91],['Basic 4',68],['Basic 5',82]].map(x=>progress(x[0],x[1],`${Math.round(x[1]*.42)} learners`)).join('')}</article><article class="viz-panel heat-panel"><header><span>WEEKLY ATTENDANCE</span><h2>Participation heatmap</h2></header><div class="heatmap">${['Mon','Tue','Wed','Thu','Fri'].map((d,i)=>`<b>${d}</b>${[1,2,3,4,5].map((_,j)=>`<i class="heat-${(i+j)%4+1}" title="${86+(i+j)%9}%"></i>`).join('')}`).join('')}</div></article><article class="viz-panel readiness-list"><header><span>SCHOOL OPERATIONS</span><h2>Readiness checks</h2></header><p><i>${icon('check',18)}</i><span><b>Teachers available</b>23 of 24 on site</span></p><p><i>${icon('file',18)}</i><span><b>Examinations</b>7 classes ready · 3 reviewing</span></p><p><i>${icon('alert',18)}</i><span><b>Maintenance</b>3 priority requests</span></p></article></section>`,
-    teacherdash: `<section class="teacher-command"><article class="viz-panel assessment-distribution"><header><span>CLASS ASSESSMENT</span><h2>Performance distribution</h2></header><div class="distribution">${[['80–100',28],['70–79',34],['60–69',22],['50–59',11],['<50',5]].map(x=>`<span><i style="height:${x[1]*2.2}px"></i><b>${x[0]}</b><small>${x[1]}%</small></span>`).join('')}</div></article><article class="viz-panel completion-stack"><header><span>ASSIGNMENT COMPLETION</span><h2>My classes</h2></header>${[['Basic 5',72,18],['Basic 6',84,9],['Basic 4',91,5]].map(x=>`<div><p><b>${x[0]}</b><span>${x[1]}% submitted</span></p><i><b style="width:${x[1]}%"></b><em style="width:${x[2]}%"></em></i></div>`).join('')}</article><article class="support-strip"><div>${icon('alert',22)}</div><span><b>5 learners need additional support</b>Two in fractions, three in multi-step reasoning.</span><button data-preview="true">Review support list</button></article><article class="ai-brief"><i>${icon('spark',24)}</i><span><b>AI Teaching Assistant</b>Draft tomorrow’s fraction recap from recent class results.</span><a href="#/teacher/ai-teaching-assistant">Open assistant ${icon('arrow',15)}</a></article></section>`,
-    studentdash: `<section class="learner-board"><article class="today-subjects"><span>TODAY’S SUBJECTS</span>${[['Mathematics','09:20','72%'],['English Studies','10:40','New'],['Basic Science','12:30','Quiz']].map(x=>`<div><i>${icon('book',19)}</i><span><b>${x[0]}</b><small>${x[1]}</small></span><em>${x[2]}</em></div>`).join('')}</article><article class="subject-progress"><span>SUBJECT PROGRESS</span>${[['Maths',82],['English',74],['Science',86]].map(x=>progress(x[0],x[1])).join('')}</article><article class="deadline-panel"><span>UPCOMING DEADLINES</span><h3>2 assignments this week</h3><p><b>FRI</b>Fraction journal · Mathematics</p><p><b>MON</b>Reading response · English</p></article><article class="learner-tools"><a href="#/student/achievements">${icon('award',20)}<span><b>8 achievements</b><small>One new this week</small></span></a><a href="#/student/offline-downloads">${icon('download',20)}<span><b>26 offline lessons</b><small>Ready on this device</small></span></a><a href="#/student/ai-learning-buddy">${icon('spark',20)}<span><b>Learning Buddy</b><small>Work through a sample</small></span></a></article></section>`,
-    parentdash: `<section class="family-board"><article class="attendance-calendar"><header><span>AMARA · OCTOBER</span><h2>Attendance calendar</h2></header><div>${Array.from({length:20},(_,i)=>`<i class="${[6,14].includes(i)?'away':'present'}">${i+1}</i>`).join('')}</div><p><b>96% attendance</b><span>18 present · 2 explained absences</span></p></article><article class="recent-results"><span>RECENT ASSESSMENTS</span>${[['Mathematics','82%','Strong reasoning'],['Basic Science','86%','Excellent inquiry'],['English Studies','74%','Reading focus']].map(x=>`<p><b>${x[0]}</b><strong>${x[1]}</strong><small>${x[2]}</small></p>`).join('')}</article><article class="family-message"><i>${icon('presentation',20)}</i><span><small>MR. OKEKE · TODAY</small><b>Amara contributed confidently during our fractions activity.</b></span></article><article class="family-notice"><span>SCHOOL ANNOUNCEMENT</span><h3>Parent learning day · 6 November</h3><p>Practical ways to support reading and numeracy at home.</p></article></section>`,
-    oversight: `<section class="oversight-board"><article class="viz-panel outcome-matrix"><header><span>LEARNING OUTCOMES</span><h2>School by subject</h2></header><div class="matrix"><b></b>${['Maths','English','Science'].map(x=>`<b>${x}</b>`).join('')}${schools.map((s,i)=>`<strong>${s.name.split(' ')[0]}</strong>${[s.performance,s.performance+3,s.performance-2].map(v=>`<i style="--score:${v}%">${v}</i>`).join('')}`).join('')}</div></article><article class="viz-panel enrolment-donut"><header><span>ENROLMENT DISTRIBUTION</span><h2>1,482 learners</h2></header>${donut(58,'primary')}<p>858 primary · 624 secondary</p></article><article class="viz-panel infrastructure-bars"><header><span>INFRASTRUCTURE READINESS</span><h2>By school</h2></header>${schools.map(s=>progress(s.name,Math.round(s.devices/s.students*300),`${s.devices} devices`)).join('')}</article><article class="executive-preview"><span>EXECUTIVE REPORTING</span><h2>Term 1 system briefing</h2><p>Performance, attendance, enrolment and infrastructure signals—prepared as an aggregate preview.</p><button data-preview="true">Open report preview</button></article></section>`,
+    executive: `<section class="command-grid"><article class="viz-panel grouped-panel"><header><span>CROSS-SCHOOL COMPARISON</span><h2>Performance and attendance</h2></header><div class="grouped-bars">${schools.map((s) => `<div><span>${s.name.replace(" Smart School", "")}</span><i style="--performance:${s.performance}%;--attendance:${s.attendance}%"><b></b><em></em></i><small>${s.performance}% learning · ${s.attendance}% attendance</small></div>`).join("")}</div></article><article class="viz-panel area-panel"><header><span>ENROLMENT MOMENTUM</span><h2>Five-term growth</h2></header><svg viewBox="0 0 520 210" role="img" aria-label="Enrolment area chart rising across five terms"><path class="area-fill" d="M20 178 L20 154 L135 130 L250 114 L365 75 L500 36 L500 178 Z"/><path class="area-line" d="M20 154 L135 130 L250 114 L365 75 L500 36"/><g>${[
+      [20, 154],
+      [135, 130],
+      [250, 114],
+      [365, 75],
+      [500, 36],
+    ]
+      .map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="5"/>`)
+      .join(
+        "",
+      )}</g></svg><div class="chart-axis"><span>2025 T1</span><span>2026 T1</span></div></article><article class="viz-panel connectivity-panel"><header><span>DEVICE CONNECTIVITY</span><h2>Fleet status</h2></header><div class="connectivity-layout">${donut(92, "online")}<div><p><i class="ready"></i><b>368</b> ready</p><p><i class="queue"></i><b>17</b> queued</p><p><i class="service"></i><b>12</b> service checks</p></div></div></article><article class="viz-panel ranking-panel"><header><span>SCHOOL PERFORMANCE RANKING</span><h2>Current term</h2></header>${[
+      ...schools,
+    ]
+      .sort((a, b) => b.performance - a.performance)
+      .map(
+        (s, i) =>
+          `<p><b>0${i + 1}</b><span>${s.name}<small>${s.attendance}% attendance</small></span><strong>${s.performance}</strong></p>`,
+      )
+      .join("")}</article></section>`,
+    schooldash: `<section class="operations-grid"><article class="viz-panel attendance-radial"><span>DAILY ATTENDANCE</span>${donut(94, "present")}<p><b>457 learners</b><small>29 absent · 6 follow-ups</small></p></article><article class="viz-panel class-population"><header><span>CLASS POPULATION</span><h2>Capacity today</h2></header>${[
+      ["Basic 1", 84],
+      ["Basic 2", 76],
+      ["Basic 3", 91],
+      ["Basic 4", 68],
+      ["Basic 5", 82],
+    ]
+      .map((x) => progress(x[0], x[1], `${Math.round(x[1] * 0.42)} learners`))
+      .join(
+        "",
+      )}</article><article class="viz-panel heat-panel"><header><span>WEEKLY ATTENDANCE</span><h2>Participation heatmap</h2></header><div class="heatmap">${["Mon", "Tue", "Wed", "Thu", "Fri"].map((d, i) => `<b>${d}</b>${[1, 2, 3, 4, 5].map((_, j) => `<i class="heat-${((i + j) % 4) + 1}" title="${86 + ((i + j) % 9)}%"></i>`).join("")}`).join("")}</div></article><article class="viz-panel readiness-list"><header><span>SCHOOL OPERATIONS</span><h2>Readiness checks</h2></header><p><i>${icon("check", 18)}</i><span><b>Teachers available</b>23 of 24 on site</span></p><p><i>${icon("file", 18)}</i><span><b>Examinations</b>7 classes ready · 3 reviewing</span></p><p><i>${icon("alert", 18)}</i><span><b>Maintenance</b>3 priority requests</span></p></article></section>`,
+    teacherdash: `<section class="teacher-command"><article class="viz-panel assessment-distribution"><header><span>CLASS ASSESSMENT</span><h2>Performance distribution</h2></header><div class="distribution">${[
+      ["80–100", 28],
+      ["70–79", 34],
+      ["60–69", 22],
+      ["50–59", 11],
+      ["<50", 5],
+    ]
+      .map(
+        (x) =>
+          `<span><i style="height:${x[1] * 2.2}px"></i><b>${x[0]}</b><small>${x[1]}%</small></span>`,
+      )
+      .join(
+        "",
+      )}</div></article><article class="viz-panel completion-stack"><header><span>ASSIGNMENT COMPLETION</span><h2>My classes</h2></header>${[
+      ["Basic 5", 72, 18],
+      ["Basic 6", 84, 9],
+      ["Basic 4", 91, 5],
+    ]
+      .map(
+        (x) =>
+          `<div><p><b>${x[0]}</b><span>${x[1]}% submitted</span></p><i><b style="width:${x[1]}%"></b><em style="width:${x[2]}%"></em></i></div>`,
+      )
+      .join(
+        "",
+      )}</article><article class="support-strip"><div>${icon("alert", 22)}</div><span><b>5 learners need additional support</b>Two in fractions, three in multi-step reasoning.</span><button data-preview="true">Review support list</button></article><article class="ai-brief"><i>${icon("spark", 24)}</i><span><b>AI Teaching Assistant</b>Draft tomorrow’s fraction recap from recent class results.</span><a href="#/teacher/ai-teaching-assistant">Open assistant ${icon("arrow", 15)}</a></article></section>`,
+    studentdash: `<section class="learner-board"><article class="today-subjects"><span>TODAY’S SUBJECTS</span>${[
+      ["Mathematics", "09:20", "72%"],
+      ["English Studies", "10:40", "New"],
+      ["Basic Science", "12:30", "Quiz"],
+    ]
+      .map(
+        (x) =>
+          `<div><i>${icon("book", 19)}</i><span><b>${x[0]}</b><small>${x[1]}</small></span><em>${x[2]}</em></div>`,
+      )
+      .join(
+        "",
+      )}</article><article class="subject-progress"><span>SUBJECT PROGRESS</span>${[
+      ["Maths", 82],
+      ["English", 74],
+      ["Science", 86],
+    ]
+      .map((x) => progress(x[0], x[1]))
+      .join(
+        "",
+      )}</article><article class="deadline-panel"><span>UPCOMING DEADLINES</span><h3>2 assignments this week</h3><p><b>FRI</b>Fraction journal · Mathematics</p><p><b>MON</b>Reading response · English</p></article><article class="learner-tools"><a href="#/student/achievements">${icon("award", 20)}<span><b>8 achievements</b><small>One new this week</small></span></a><a href="#/student/offline-downloads">${icon("download", 20)}<span><b>26 offline lessons</b><small>Ready on this device</small></span></a><a href="#/student/ai-learning-buddy">${icon("spark", 20)}<span><b>Learning Buddy</b><small>Work through a sample</small></span></a></article></section>`,
+    parentdash: `<section class="family-board"><article class="attendance-calendar"><header><span>AMARA · OCTOBER</span><h2>Attendance calendar</h2></header><div>${Array.from({ length: 20 }, (_, i) => `<i class="${[6, 14].includes(i) ? "away" : "present"}">${i + 1}</i>`).join("")}</div><p><b>96% attendance</b><span>18 present · 2 explained absences</span></p></article><article class="recent-results"><span>RECENT ASSESSMENTS</span>${[
+      ["Mathematics", "82%", "Strong reasoning"],
+      ["Basic Science", "86%", "Excellent inquiry"],
+      ["English Studies", "74%", "Reading focus"],
+    ]
+      .map(
+        (x) =>
+          `<p><b>${x[0]}</b><strong>${x[1]}</strong><small>${x[2]}</small></p>`,
+      )
+      .join(
+        "",
+      )}</article><article class="family-message"><i>${icon("presentation", 20)}</i><span><small>MR. OKEKE · TODAY</small><b>Amara contributed confidently during our fractions activity.</b></span></article><article class="family-notice"><span>SCHOOL ANNOUNCEMENT</span><h3>Parent learning day · 6 November</h3><p>Practical ways to support reading and numeracy at home.</p></article></section>`,
+    oversight: `<section class="oversight-board"><article class="viz-panel outcome-matrix"><header><span>LEARNING OUTCOMES</span><h2>School by subject</h2></header><div class="matrix"><b></b>${["Maths", "English", "Science"].map((x) => `<b>${x}</b>`).join("")}${schools.map((s, i) => `<strong>${s.name.split(" ")[0]}</strong>${[s.performance, s.performance + 3, s.performance - 2].map((v) => `<i style="--score:${v}%">${v}</i>`).join("")}`).join("")}</div></article><article class="viz-panel enrolment-donut"><header><span>ENROLMENT DISTRIBUTION</span><h2>1,482 learners</h2></header>${donut(58, "primary")}<p>858 primary · 624 secondary</p></article><article class="viz-panel infrastructure-bars"><header><span>INFRASTRUCTURE READINESS</span><h2>By school</h2></header>${schools.map((s) => progress(s.name, Math.round((s.devices / s.students) * 300), `${s.devices} devices`)).join("")}</article><article class="executive-preview"><span>EXECUTIVE REPORTING</span><h2>Term 1 system briefing</h2><p>Performance, attendance, enrolment and infrastructure signals—prepared as an aggregate preview.</p><button data-preview="true">Open report preview</button></article></section>`,
   };
   return supplements[kind] || "";
 }
@@ -1509,13 +1670,19 @@ function render() {
 }
 function bind() {
   const activeRoute = route();
-  if (activeRoute.page) $(".page")?.classList.add(`kind-${activeRoute.page.kind}`, `workspace-${activeRoute.ws.id}`);
+  if (activeRoute.page) {
+    $(".page")?.classList.add(
+      `kind-${activeRoute.page.kind}`,
+      `workspace-${activeRoute.ws.id}`,
+    );
+    $(".app-shell")?.classList.add(`workspace-shell-${activeRoute.ws.id}`);
+  }
   const screenTotal = workspaces.reduce((n, w) => n + w.pages.length, 0);
   const openIndex = $("#openIndex");
   if (openIndex) openIndex.textContent = `View ${screenTotal}-screen index`;
   document.querySelectorAll(".sidebar>nav a").forEach((link) => {
     const slot = link.querySelector("i");
-    if (slot) slot.innerHTML = icon(navIcon(link.textContent), 18);
+    if (slot) slot.outerHTML = icon(navIcon(link.textContent), 18);
   });
   document.querySelectorAll(".brand").forEach((el) => {
     const context = el.closest(".presentation")

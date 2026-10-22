@@ -1,12 +1,23 @@
-const fs = require('fs');
-const path = require('path');
-const root = path.resolve(__dirname, '..');
-const out = path.join(root, 'dist');
+const fs = require("fs");
+const path = require("path");
+const root = path.resolve(__dirname, "..");
+const out = path.join(root, "dist");
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
-for (const file of ['index.html', 'styles.css', 'app.js', 'demo-config.js']) fs.copyFileSync(path.join(root, file), path.join(out, file));
-const qrOut = path.join(out, 'vendor');
+for (const file of ["index.html", "styles.css", "app.js", "demo-config.js"])
+  fs.copyFileSync(path.join(root, file), path.join(out, file));
+const qrOut = path.join(out, "vendor");
 fs.mkdirSync(qrOut, { recursive: true });
-fs.copyFileSync(path.join(root, 'node_modules', 'qrcode-generator', 'qrcode.js'), path.join(qrOut, 'qrcode.js'));
-fs.cpSync(path.join(root, 'assets'), path.join(out, 'assets'), { recursive: true });
+fs.copyFileSync(
+  path.join(root, "node_modules", "qrcode-generator", "qrcode.js"),
+  path.join(qrOut, "qrcode.js"),
+);
+fs.cpSync(
+  path.join(root, "node_modules", "@phosphor-icons", "web", "src", "regular"),
+  path.join(qrOut, "phosphor", "regular"),
+  { recursive: true },
+);
+fs.cpSync(path.join(root, "assets"), path.join(out, "assets"), {
+  recursive: true,
+});
 console.log(`Built static demo to ${out}`);
