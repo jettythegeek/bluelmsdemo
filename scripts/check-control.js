@@ -1,0 +1,38 @@
+const fs = require('fs');
+const vm = require('vm');
+const assert = require('assert/strict');
+const root = require('path').resolve(__dirname, '..');
+const app = fs.readFileSync(require('path').join(root, 'app.js'), 'utf8');
+const storage = new Map();
+const context = { state: { school: 'ubakala' }, icon: () => '', fmt: n => n.toLocaleString('en-NG'), localStorage: { getItem: k => storage.get(k) || null, setItem: (k,v) => storage.set(k,v) }, Date };
+vm.createContext(context);
+vm.runInContext(app.slice(0, app.indexOf('const state =')) + fs.readFileSync(require('path').join(root, 'control-centre.js'), 'utf8'), context);
+const run = code => vm.runInContext(code, context);
+const pages = run("workspaces.find(w => w.id === 'bgdl').pages");
+for (const page of pages) {
+  const html = run(`controlPage('${page.kind}')`);
+  assert.ok(html.includes('control-centre'), page.kind);
+  for (const [, path] of html.matchAll(/href="#\/bgdl\/([^"#]+)"/g)) assert.ok(pages.some(p => p.path === path), `Invalid link: ${path}`);
+}
+const all = run("controlPage('executive')");
+assert.ok(all.includes('1,482'));
+assert.ok(all.includes('91.2%'));
+assert.ok(all.includes('375 of 404'));
+assert.ok(run('controlSchools().every(s => s.ready + s.queued + s.service === s.devices)'));
+run("controlState.school = 'umuomaikwu'");
+const one = run("controlPage('executive')");
+assert.ok(one.includes('17 of 19'));
+assert.ok(!one.includes('<b>Secondary Demo</b>'));
+run("controlState.period = 'week'");
+assert.equal(run('controlAttendance(controlRows()[0])'), 89.8);
+run("controlState.school = 'all'; controlState.period = 'today'");
+run("controlPage('schools'); controlState.search = 'no-such-school'");
+assert.ok(run("controlPage('schools')").includes('No schools found'));
+assert.ok(!run("controlPage('support')").includes('No requests here'));
+run("let saved = controlLoad(); saved.tickets['BG-104'] = {owner:'Academic lead',status:'Resolved'}; controlSave(saved,'Reviewed request')");
+assert.equal(run("controlTickets().find(t=>t.id === 'BG-104').status"), 'Resolved');
+assert.equal(run('controlLoad().audit[0].message'), 'Reviewed request');
+run("let preferences = controlLoad(); preferences.settings.attendanceTarget = 90; controlSave(preferences,'Changed target')");
+assert.ok(run("controlPage('executive')").includes('Target 90%'));
+assert.equal(run("controlEscape('<script>')"), '&lt;script&gt;');
+console.log('Validated all 11 Control Centre pages, route links, school/period filters, weighted totals, device counts, local updates and attendance targets.');

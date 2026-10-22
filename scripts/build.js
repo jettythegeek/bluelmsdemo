@@ -4,7 +4,7 @@ const root = path.resolve(__dirname, "..");
 const out = path.join(root, "dist");
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
-for (const file of ["index.html", "styles.css", "app.js", "demo-config.js"])
+for (const file of ["index.html", "styles.css", "app.js", "control-centre.js", "demo-config.js"])
   fs.copyFileSync(path.join(root, file), path.join(out, file));
 const qrOut = path.join(out, "vendor");
 fs.mkdirSync(qrOut, { recursive: true });

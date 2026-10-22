@@ -1,76 +1,76 @@
 const workspaces = [
   {
     id: "bgdl",
-    label: "BGDL Control Centre",
+    label: "Blue Giraffe Control Centre",
     short: "Control Centre",
     icon: "layout-dashboard",
     tone: "blue",
-    audience: "Portfolio leadership",
+    audience: "School network team",
     pages: [
       {
         path: "executive-overview",
-        title: "Executive Overview",
-        desc: "A portfolio-wide pulse across schools, learning and operations.",
+        title: "Network Overview",
+        desc: "Know how your schools are doing and what needs your attention.",
         kind: "executive",
       },
       {
         path: "schools-directory",
-        title: "Schools Directory",
-        desc: "Every institution, deployment stage and headline metric.",
+        title: "Our Schools",
+        desc: "Find a school, check its progress and choose your next step.",
         kind: "schools",
       },
       {
         path: "school-profile",
         title: "School Profile",
-        desc: "A complete snapshot of one illustrative school.",
+        desc: "Get to know the school, its progress and where it needs support.",
         kind: "profile",
       },
       {
         path: "users-roles",
-        title: "Users & Roles",
-        desc: "Role distribution and access visibility across the platform.",
+        title: "People & Access",
+        desc: "See who each workspace is for and what they can manage.",
         kind: "users",
       },
       {
         path: "cross-school-analytics",
-        title: "Cross-School Analytics",
-        desc: "Compare enrolment, attendance and outcomes.",
+        title: "Compare Schools",
+        desc: "See what is working and where extra support could help.",
         kind: "analytics",
       },
       {
         path: "attendance-intelligence",
-        title: "Attendance Intelligence",
-        desc: "Surface patterns and support opportunities early.",
+        title: "Attendance",
+        desc: "Follow student and teacher attendance across your schools.",
         kind: "attendance",
       },
       {
         path: "devices-connectivity",
         title: "Devices & Connectivity",
-        desc: "Readiness, allocation and illustrative sync states.",
+        desc: "Keep classroom devices ready and school records moving.",
         kind: "devices",
       },
       {
         path: "ai-management-insights",
-        title: "AI Management Insights",
-        desc: "Scripted signals for faster leadership decisions.",
+        title: "Insights & Next Steps",
+        desc: "Understand the signals and plan a helpful response.",
         kind: "insights",
       },
       {
         path: "content-distribution",
-        title: "Content Distribution",
-        desc: "Approved curriculum resources across the school network.",
+        title: "Learning Packs",
+        desc: "Choose useful resources and the schools that need them.",
         kind: "content",
       },
       {
         path: "support-integrations",
-        title: "Support & Integrations",
-        desc: "A clear view of service requests and planned connections.",
+        title: "Support & Connections",
+        desc: "Give every school request an owner and a next step.",
         kind: "support",
       },
       {
         path: "platform-settings",
-        title: "Platform Settings",
-        desc: "Tenant policy, licensing and audit preview.",
+        title: "Workspace Settings",
+        desc: "Set your preferences and review recent changes.",
         kind: "settings",
       },
     ],
@@ -566,7 +566,7 @@ function route() {
   if (raw[0] === "presentation")
     return {
       presentation: true,
-      slide: Math.max(0, Math.min(5, (Number(raw[1]) || 1) - 1)),
+      slide: Math.max(0, Math.min(presentationSlides.length - 1, (Number(raw[1]) || 1) - 1)),
     };
   if (raw[0] === "demo") return { welcome: true };
   const ws = workspaces.find((w) => w.id === raw[0]) || workspaces[0];
@@ -601,6 +601,14 @@ function metricIcon(label) {
 function navIcon(label) {
   return (
     {
+      "Network Overview": "gauge",
+      "Our Schools": "buildings",
+      "People & Access": "users-three",
+      "Compare Schools": "chart-bar",
+      "Insights & Next Steps": "lightbulb",
+      "Learning Packs": "books",
+      "Support & Connections": "lifebuoy",
+      "Workspace Settings": "sliders-horizontal",
       "Executive Overview": "gauge",
       "Schools Directory": "buildings",
       "School Profile": "identification-card",
@@ -1022,6 +1030,7 @@ function dashboardQuickActions(kind) {
   return `<section class="dash-quick-actions"><header><div><span>YOUR DAILY TOOLKIT</span><h2>What would you like to do?</h2></div><p>${teacher ? "Less searching. More time for teaching." : "Keep the school day moving."}</p></header><nav aria-label="${teacher ? "Teacher" : "School management"} quick actions">${actions.map(([path,glyph,title,desc])=>`<a href="#/${workspace}/${path}"><span>${icon(glyph,23)}</span><div><b>${title}</b><small>${desc}</small></div>${icon("arrow-right",16)}</a>`).join("")}</nav></section>`;
 }
 function renderKind(kind) {
+  if (route().ws?.id === "bgdl") return controlPage(kind);
   const s = currentSchool(),
     secondary = state.mode === "secondary",
     teacherWorkspace = location.hash.includes("/teacher/");
@@ -1800,47 +1809,93 @@ function presentationArt(kind, label) {
   };
   return `<div class="illustration presentation-art" role="img" aria-label="${label}">${art[kind]}</div>`;
 }
+function slidePhoto(file, alt, caption) {
+  return `<figure class="slide-photo"><img src="assets/presentation/${file}" alt="${alt}"/><figcaption>${caption}</figcaption></figure>`;
+}
+function slidePoints(items, tone = "purpose") {
+  const symbols = tone === "risk" ? ["warning", "lock-key", "shield-warning", "trend-down"] : ["sparkle", "target", "shield-check"];
+  return `<dl class="slide-points points-${tone}">${items.map(([title, copy], i) => `<div><span class="point-symbol">${icon(symbols[i % symbols.length], 25)}</span><dt>${title}</dt><dd>${copy}</dd></div>`).join("")}</dl>`;
+}
 const presentationSlides = [
   {
-    kicker: "INTRODUCING BLUELMS",
-    title: "One learning platform. Every school day.",
-    copy: "A connected digital experience for learning, teaching, school operations, families and responsible oversight.",
+    kicker: "INTRODUCTION",
+    title: "We build smart infrastructure. Our technology must follow.",
+    copy: "Blue Giraffe builds schools for the future. The technology that runs them must meet the same standard, supporting better teaching, stronger school management and visible results.",
     layout: "intro",
-    body: `<div class="presentation-ecosystem">${illustration("ecosystem", "BlueLMS connecting every school experience")}</div>`,
+    body: slidePhoto("smart-campus.png", "An imagined Nigerian smart-school campus with pupils and a teacher arriving for the day", "Better schools are only the beginning"),
   },
   {
-    kicker: "THE CHALLENGE",
-    title: "Schools generate activity everywhere—but insight lives nowhere.",
-    copy: "Disconnected records, repeated manual work and delayed visibility make it harder for teams to support learners at the right moment.",
+    kicker: "OUR CURRENT CHALLENGE",
+    title: "Fragmented platforms put our schools and business at risk",
+    copy: "Every disconnected system creates more work for our people, less visibility for oversight and less control for Blue Giraffe.",
     layout: "challenge",
-    body: `${presentationArt("challenge", "Disconnected school tools and records converging on a shared need")}<div class="story-points"><span><b>01</b>Fragmented records</span><span><b>02</b>Manual coordination</span><span><b>03</b>Late insight</span></div>`,
+    details: slidePoints([
+      ["School work gets interrupted", "Unreliable platforms leave staff repeating tasks and reconciling records instead of supporting learners."],
+      ["Vendors hold the control", "We depend on outside suppliers to change, connect or improve the tools our schools rely on."],
+      ["ASUBEB cannot see the full picture", "Scattered reports make it harder to demonstrate school performance and respond confidently to oversight."],
+      ["Our investment builds no lasting asset", "We keep spending on tools without building a Blue Giraffe platform that can grow with our schools."],
+    ], "risk"),
+    body: slidePhoto("fragmented-systems.png", "Concept illustration of a school administrator struggling with disconnected records and locked systems", "Our people should be teaching and leading, not chasing records"),
   },
   {
-    kicker: "THE BLUELMS SOLUTION",
-    title: "Turn every school day into shared momentum.",
-    copy: "BlueLMS unifies daily workflows around one trusted operating picture—while giving every role a focused, useful experience.",
-    layout: "solution",
-    body: `${presentationArt("solution", "A unified BlueLMS platform connecting school experiences")}<div class="solution-proof"><b>ONE PLATFORM</b><span>Shared context</span><i></i><span>Role-specific clarity</span><i></i><span>Better decisions</span></div>`,
+    kicker: "WHAT OUR SCHOOLS NEED",
+    title: "Smart schools need equally smart technology",
+    copy: "The system behind each school should help us improve learning and operations while protecting Blue Giraffe’s business interests.",
+    layout: "standard",
+    details: slidePoints([
+      ["Smart and innovative", "Connect school records, teaching and learning. Use AI to help people act on what they see."],
+      ["Driven by results", "Track attendance, curriculum coverage and learning outcomes so support reaches the schools and learners who need it."],
+      ["Built around our interests", "Set our own product direction, retain control of our data and build technology we can extend across more schools."],
+    ]),
+    body: slidePhoto("connected-classroom.png", "Concept illustration of a Nigerian teacher guiding curious students through a virtual circuit experiment", "Give every learner more ways to discover"),
   },
   {
-    kicker: "ONE PLATFORM, SIX EXPERIENCES",
-    title: "Built around people—not software modules.",
-    copy: "Six purpose-built workspaces keep each audience focused while the platform keeps the institution connected.",
-    layout: "workspaces",
-    body: `<div class="workspace-orbit"><div class="orbit-centre"><b>BlueLMS</b><span>61 connected screens</span></div>${workspaces.map((w, i) => `<div class="orbit-workspace ow${i}"><i>${icon(w.icon, 23)}</i><span><b>${w.label}</b><small>${w.audience}</small></span></div>`).join("")}</div>`,
+    kicker: "INTRODUCING BLUELMS",
+    title: "BlueLMS: an AI-powered school management system",
+    copy: "An integrated learning management system connects lessons, assignments and assessments with daily school operations, with capability for Virtual Labs.",
+    layout: "product",
+    details: slidePoints([
+      ["One connected school system", "Give school leaders, teachers, students and parents a shared record with a workspace suited to their role."],
+      ["Oversight across the network", "Help Blue Giraffe manage school readiness and give authorised stakeholders a clear view of performance."],
+    ]),
+    body: `<figure class="product-proof"><img src="assets/presentation/control-centre.png" alt="BlueLMS Control Centre showing network attendance, school support requests and device readiness"/><figcaption>Blue Giraffe Control Centre · Product demonstration</figcaption></figure><p class="vision-note">Product vision: AI and offline sync are planned capabilities. The demo uses fictional records.</p>`,
   },
   {
-    kicker: "WHAT MAKES BLUELMS POWERFUL",
-    title: "Useful at every level. Coherent as a whole.",
-    copy: "BlueLMS connects the moments that shape performance—from lesson preparation to portfolio decisions.",
-    layout: "capabilities",
-    body: `${presentationArt("capabilities", "A BlueLMS dashboard turning school activity into coordinated insight")}<div class="capability-ribbon"><span><i>${icon("book", 20)}</i>Learning</span><span><i>${icon("spark", 20)}</i>Teaching</span><span><i>${icon("school", 20)}</i>Operations</span><span><i>${icon("chart", 20)}</i>Insight</span></div>`,
+    kicker: "BLUELMS FEATURES",
+    title: "The tools to run schools and support every learner",
+    copy: "Connected workspaces for the people who teach, learn, manage and oversee our schools.",
+    layout: "features",
+    body: `<div class="feature-list">${[
+      ["Student mobile app", "Lessons, assignments and progress, with planned offline learning and sync."],
+      ["Teacher Studio", "Plan lessons, set work, record attendance and follow learner progress."],
+      ["Management dashboard", "Manage admissions, staff, timetables, results and school assets."],
+      ["Stakeholder dashboard", "Review school performance through authorised aggregate information."],
+      ["Parent dashboard", "Follow children’s attendance, results, feedback and school updates."],
+      ["Control Centre", "Oversee schools, devices, learning packs and support requests."],
+      ["Stakeholder Intelligence", "Compare enrolment, attendance, exam outcomes and progression to guide support."],
+      ["Virtual Labs", "Practise through simulations, starting with an interactive Physics circuit lab."],
+      ["AI Assistant", "Planned support for lesson preparation, learning explanations and management insight."],
+    ].map(([title, copy], i) => `<article><span class="feature-symbol">${icon(["device-mobile","chalkboard-teacher","buildings","chart-bar","users-three","squares-four","chart-line-up","flask","sparkle"][i],28)}</span><div><h2>${title}</h2><p>${copy}</p></div></article>`).join("")}</div>`,
   },
   {
-    kicker: "EXPERIENCE BLUELMS",
-    title: "See the connected school experience for yourself.",
-    copy: "Scan the code to explore independently on your device, or enter Demo Mode with us now.",
+    kicker: "WHY BLUELMS",
+    title: "Take control. Help every school succeed.",
+    copy: "One connected platform, designed to turn today’s risks into lasting value for Blue Giraffe, our schools and the communities we serve.",
+    layout: "value",
+    body: `<div class="value-story"><figure class="benefit-image"><img src="assets/presentation/connected-classroom.png" alt="A teacher and students discovering together through connected learning"/><figcaption>More time to teach.<br/>More room to discover.</figcaption></figure><div class="value-list">${[
+      ["Connected, dependable operations", "Bring school work into one system, with planned offline learning to reduce disruption for students."],
+      ["Control over our technology", "Build toward ownership of our roadmap and data, with integrations and portability that reduce vendor dependence."],
+      ["Clearer ASUBEB oversight", "Give government a consistent view of attendance, outcomes and infrastructure to identify gaps and direct support."],
+      ["A lasting Blue Giraffe asset", "Develop a reusable platform that can support more schools, new services and future partnerships."],
+      ["More support for teaching and learning", "Reduce repeated administration, help teachers spot learning gaps and keep parents informed."],
+    ].map(([title, copy],i) => `<article><span class="benefit-check">${icon("check",27)}</span><div><h2>${title}</h2><p>${copy}</p></div></article>`).join("")}</div></div>`,
+  },
+  {
+    kicker: "DEMO",
+    title: "See BlueLMS in action",
+    copy: "Explore the school day through the eyes of a student, teacher, school leader, parent and government stakeholder. Then see how Blue Giraffe oversees the whole network.",
     layout: "invite",
+    details: `<p class="demo-scope">Product demonstration · Fictional data<br/>AI responses and offline states illustrate the intended experience.</p>`,
     body: "",
   },
 ];
@@ -1861,7 +1916,7 @@ function audienceDemoUrl() {
 function qrInvite() {
   const url = audienceDemoUrl();
   if (!url || typeof qrcode !== "function")
-    return `<div class="qr-setup"><i>${icon("link", 32)}</i><b>Public demo link not configured</b><span>Publish the site and set <code>BLUELMS_CONFIG.publicUrl</code> to create the audience QR code.</span></div>`;
+    return `<div class="demo-preview"><span>EXPLORE THE EXPERIENCE</span><h2>Start with a school. See the whole network.</h2><nav aria-label="Demo starting points"><a href="#/bgdl/executive-overview">Blue Giraffe Control Centre ${icon("arrow",18)}</a><a href="#/teacher/teacher-dashboard">Teacher Studio ${icon("arrow",18)}</a><a href="#/student/virtual-lab">Student Virtual Lab ${icon("arrow",18)}</a><a href="#/stakeholder/oversight-overview">Government &amp; stakeholder oversight ${icon("arrow",18)}</a></nav></div>`;
   const qr = qrcode(0, "M");
   qr.addData(url);
   qr.make();
@@ -1870,8 +1925,8 @@ function qrInvite() {
 function presentation(slide) {
   state.presentationSlide = slide;
   const s = presentationSlides[slide];
-  const final = slide === 5;
-  return `<main class="presentation slide-${s.layout}" data-slide="${slide + 1}"><header><a href="#/presentation/1" class="brand"><div class="brand-mark light"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>Management presentation</span></div></a><div class="presentation-tools"><span>${String(slide + 1).padStart(2, "0")} / 06</span><button id="fullscreenPresentation" aria-label="Enter full-screen presentation">${icon("monitor", 18)} <em>Full screen</em></button></div></header><section class="presentation-stage"><div class="presentation-copy"><span>${s.kicker}</span><h1>${s.title}</h1><p>${s.copy}</p>${final ? `<a class="enter-demo" href="#/demo">Enter Demo Mode ${icon("arrow", 19)}</a>` : ""}</div><div class="presentation-visual">${final ? qrInvite() : s.body}</div></section><footer><nav aria-label="Presentation sections">${presentationSlides.map((x, i) => `<a href="#/presentation/${i + 1}" class="${i === slide ? "active" : ""}" aria-label="${x.kicker}"><i></i><span>${x.kicker}</span></a>`).join("")}</nav><div><a class="slide-control ${slide === 0 ? "disabled" : ""}" href="#/presentation/${Math.max(1, slide)}" aria-label="Previous section">${icon("left", 18)}</a><a class="slide-control ${final ? "disabled" : ""}" href="#/presentation/${Math.min(6, slide + 2)}" aria-label="Next section">${icon("arrow", 18)}</a></div></footer><div class="toast" id="toast">Link copied.</div></main>`;
+  const final = slide === presentationSlides.length - 1;
+  return `<main class="presentation slide-${s.layout}" data-slide="${slide + 1}"><header><a href="#/presentation/1" class="brand"><div class="brand-mark light"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>Management presentation</span></div></a><div class="presentation-tools"><span>${String(slide + 1).padStart(2, "0")} / ${String(presentationSlides.length).padStart(2, "0")}</span><button id="fullscreenPresentation" aria-label="Enter full-screen presentation">${icon("monitor", 18)} <em>Full screen</em></button></div></header><section class="presentation-stage"><div class="presentation-copy"><span>${s.kicker}</span><h1>${s.title}</h1><p>${s.copy}</p>${s.details || ""}${final ? `<a class="enter-demo" href="#/demo">Enter Demo Mode ${icon("arrow", 19)}</a>` : ""}</div><div class="presentation-visual">${final ? qrInvite() : s.body}</div></section><footer><nav aria-label="Presentation sections">${presentationSlides.map((x, i) => `<a href="#/presentation/${i + 1}" class="${i === slide ? "active" : ""}" aria-label="${x.kicker}"><i></i><span>${x.kicker}</span></a>`).join("")}</nav><div><a class="slide-control ${slide === 0 ? "disabled" : ""}" href="#/presentation/${Math.max(1, slide)}" aria-label="Previous section">${icon("left", 18)}</a><a class="slide-control ${final ? "disabled" : ""}" href="#/presentation/${Math.min(presentationSlides.length, slide + 2)}" aria-label="Next section">${icon("arrow", 18)}</a></div></footer><div class="toast" id="toast">Link copied.</div></main>`;
 }
 function welcome() {
   return `<main class="welcome"><nav><div class="brand"><div class="brand-mark"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>by Blue Giraffe Development</span></div></div>${demoTag("Product vision demo")}</nav><section class="welcome-hero"><div><span class="overline">BUILT FOR THE WAY SCHOOLS REALLY WORK</span><h1>One learning platform.<br><em>Every school day.</em></h1><p>Explore a connected vision for learning, teaching, school operations and responsible oversight—designed for Nigerian schools.</p><div class="welcome-actions"><a href="#/bgdl/executive-overview">Enter the experience <b>${icon("arrow", 18)}</b></a><button id="openIndex">View 61-screen index</button></div><small>All people, records and statistics are fictional demonstration data.</small></div><div class="welcome-illustration">${illustration("ecosystem", "BlueLMS connecting schools, teaching, learning and management")}</div></section><section class="workspace-launch"><header><span>EXPLORE BY WORKSPACE</span><h2>Six perspectives. One connected platform.</h2></header><div>${workspaces.map((w, i) => `<a href="#/${w.id}/${w.pages[0].path}" class="launch-card ${w.tone}"><span>0${i + 1}</span><i>${icon(w.icon, 22)}</i><h3>${w.label}</h3><p>${w.audience}</p><b>Explore workspace ${icon("arrow", 16)}</b></a>`).join("")}</div></section><footer><span>BlueLMS NextGen · Management demonstration · October 2026</span><b>Built by BGDL</b></footer></main>`;
@@ -1894,7 +1949,7 @@ function shell(ws, page) {
           ].includes(p.kind)
         : true,
   );
-  return `<div class="app-shell tone-${ws.tone}"><aside class="sidebar ${state.sidebar ? "collapsed" : ""}"><div class="side-brand"><a href="#/" class="brand"><div class="brand-mark light"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>NextGen</span></div></a><button id="collapse" aria-label="Collapse sidebar">${icon("left", 19)}</button></div><div class="workspace-label"><span>${icon(ws.icon, 19)}</span><div><small>WORKSPACE</small><b>${ws.short}</b></div></div><nav>${visiblePages.map((p) => `<a href="#/${ws.id}/${p.path}" class="${p.path === page.path ? "active" : ""}"><i>${icon(metricIcon(p.title), 18)}</i><span>${p.title}</span></a>`).join("")}</nav><div class="side-bottom"><button id="workspaceSwitcher"><span>${icon("switch", 18)}</span><div><small>SWITCH WORKSPACE</small><b>${ws.label}</b></div></button><a href="#/"><span>${icon("home", 18)}</span><div><small>EXIT WORKSPACE</small><b>Welcome screen</b></div></a></div></aside><main class="app-main"><header class="topbar"><button class="mobile-menu" id="mobileMenu">${icon("menu", 20)}</button><div class="crumb"><span>BlueLMS</span><i>${icon("chevron", 15)}</i><b>${page.title}</b></div><div class="top-actions"><button class="search" data-preview="true">${icon("search", 17)} <span>Search</span><kbd>Ctrl K</kbd></button>${ws.id === "student" ? `<div class="mode-switch"><button data-mode="primary" class="${state.mode === "primary" ? "active" : ""}">Primary</button><button data-mode="secondary" class="${state.mode === "secondary" ? "active" : ""}">Secondary</button></div>` : ""}${ws.id === "school" ? `<select id="roleSelect" aria-label="School management role"><option value="principal" ${state.role === "principal" ? "selected" : ""}>Principal / Headteacher</option><option value="admin" ${state.role === "admin" ? "selected" : ""}>School Administrator</option></select>` : ""}${ws.id === "bgdl" ? `<select id="bgdlRoleSelect" aria-label="BGDL role"><option value="super" ${state.bgdlRole === "super" ? "selected" : ""}>BGDL Super Admin</option><option value="ict" ${state.bgdlRole === "ict" ? "selected" : ""}>ICT / Support</option></select>` : ""}${["bgdl", "school", "parent", "teacher"].includes(ws.id) ? `<select id="schoolSelect" aria-label="Demo school">${schools.map((x) => `<option value="${x.id}" ${x.id === state.school ? "selected" : ""}>${x.name}</option>`).join("")}</select>` : ""}<button class="bell" aria-label="Notifications" data-preview="true">${icon("bell", 19)}<i></i></button><button class="profile" data-preview="true"><i>${ws.id === "student" ? "AO" : ws.id === "parent" ? "CO" : "NN"}</i><span><b>${ws.id === "student" ? "Amara Okafor" : ws.id === "parent" ? "Chidi Okafor" : "Ngozi Nwafor"}</b><small>${ws.audience}</small></span></button></div></header><div class="page"><header class="page-head"><div><div class="eyebrow">${ws.label.toUpperCase()} <i></i> TERM 1 · 2026/27</div><h1>${page.title}</h1><p>${page.desc}</p></div><div>${demoTag()}<button class="screen-count" id="screenIndex">${workspaces.reduce((n, w) => n + w.pages.length, 0)} screens ${icon("arrow", 16)}</button></div></header>${renderKind(page.kind)}</div></main><div class="workspace-drawer" id="workspaceDrawer"><div><header><span>SWITCH PERSPECTIVE</span><button id="closeDrawer" aria-label="Close">${icon("close", 18)}</button></header><h2>Explore BlueLMS</h2><p>Each workspace is tailored to the decisions its people make.</p><nav>${workspaces.map((w) => `<a href="#/${w.id}/${w.pages[0].path}" class="${w.id === ws.id ? "active" : ""}"><i>${icon(w.icon, 20)}</i><span><b>${w.label}</b><small>${w.audience} · ${w.pages.length} screens</small></span><em>${icon("arrow", 18)}</em></a>`).join("")}</nav></div></div><div class="toast" id="toast">This control is a visual preview only.</div></div>`;
+  return `<div class="app-shell tone-${ws.tone}"><aside class="sidebar ${state.sidebar ? "collapsed" : ""}"><div class="side-brand"><a href="#/" class="brand"><div class="brand-mark light"><i></i><i></i><i></i></div><div><b>BlueLMS</b><span>NextGen</span></div></a><button id="collapse" aria-label="Collapse sidebar">${icon("left", 19)}</button></div><div class="workspace-label"><span>${icon(ws.icon, 19)}</span><div><small>WORKSPACE</small><b>${ws.short}</b></div></div><nav>${visiblePages.map((p) => `<a href="#/${ws.id}/${p.path}" class="${p.path === page.path ? "active" : ""}"><i>${icon(metricIcon(p.title), 18)}</i><span>${p.title}</span></a>`).join("")}</nav><div class="side-bottom"><button id="workspaceSwitcher"><span>${icon("switch", 18)}</span><div><small>SWITCH WORKSPACE</small><b>${ws.label}</b></div></button><a href="#/"><span>${icon("home", 18)}</span><div><small>EXIT WORKSPACE</small><b>Welcome screen</b></div></a></div></aside><main class="app-main"><header class="topbar"><button class="mobile-menu" id="mobileMenu">${icon("menu", 20)}</button><div class="crumb"><span>BlueLMS</span><i>${icon("chevron", 15)}</i><b>${page.title}</b></div><div class="top-actions"><button class="search" data-preview="true">${icon("search", 17)} <span>Search</span><kbd>Ctrl K</kbd></button>${ws.id === "student" ? `<div class="mode-switch"><button data-mode="primary" class="${state.mode === "primary" ? "active" : ""}">Primary</button><button data-mode="secondary" class="${state.mode === "secondary" ? "active" : ""}">Secondary</button></div>` : ""}${ws.id === "school" ? `<select id="roleSelect" aria-label="School management role"><option value="principal" ${state.role === "principal" ? "selected" : ""}>Principal / Headteacher</option><option value="admin" ${state.role === "admin" ? "selected" : ""}>School Administrator</option></select>` : ""}${ws.id === "bgdl" ? `<select id="bgdlRoleSelect" aria-label="BGDL role"><option value="super" ${state.bgdlRole === "super" ? "selected" : ""}>BGDL Super Admin</option><option value="ict" ${state.bgdlRole === "ict" ? "selected" : ""}>ICT / Support</option></select>` : ""}${["school", "parent", "teacher"].includes(ws.id) ? `<select id="schoolSelect" aria-label="Demo school">${schools.map((x) => `<option value="${x.id}" ${x.id === state.school ? "selected" : ""}>${x.name}</option>`).join("")}</select>` : ""}<button class="bell" aria-label="Notifications" data-preview="true">${icon("bell", 19)}<i></i></button><button class="profile" data-preview="true"><i>${ws.id === "bgdl" ? "BG" : ws.id === "student" ? "AO" : ws.id === "parent" ? "CO" : "NN"}</i><span><b>${ws.id === "bgdl" ? "Blue Giraffe team" : ws.id === "student" ? "Amara Okafor" : ws.id === "parent" ? "Chidi Okafor" : "Ngozi Nwafor"}</b><small>${ws.audience}</small></span></button></div></header><div class="page"><header class="page-head"><div><div class="eyebrow">${ws.label.toUpperCase()} <i></i> TERM 1 · 2026/27</div><h1>${page.title}</h1><p>${page.desc}</p></div><div>${demoTag()}<button class="screen-count" id="screenIndex">${workspaces.reduce((n, w) => n + w.pages.length, 0)} screens ${icon("arrow", 16)}</button></div></header>${renderKind(page.kind)}</div></main><div class="workspace-drawer" id="workspaceDrawer"><div><header><span>SWITCH PERSPECTIVE</span><button id="closeDrawer" aria-label="Close">${icon("close", 18)}</button></header><h2>Explore BlueLMS</h2><p>Each workspace is tailored to the decisions its people make.</p><nav>${workspaces.map((w) => `<a href="#/${w.id}/${w.pages[0].path}" class="${w.id === ws.id ? "active" : ""}"><i>${icon(w.icon, 20)}</i><span><b>${w.label}</b><small>${w.audience} · ${w.pages.length} screens</small></span><em>${icon("arrow", 18)}</em></a>`).join("")}</nav></div></div><div class="toast" id="toast">This control is a visual preview only.</div></div>`;
 }
 function screenIndex() {
   const count = workspaces.reduce((n, w) => n + w.pages.length, 0);
@@ -1918,6 +1973,7 @@ function render() {
   bind();
 }
 function bind() {
+  bindControlCentre();
   const oversightFilter = $("#oversight-school");
   if (oversightFilter) oversightFilter.onchange = e => { state.oversightSchool = e.target.value; render(); };
   bindTeacherLab();
@@ -2046,7 +2102,7 @@ function bind() {
       const delta = e.changedTouches[0].screenX - state.touchStartX;
       if (Math.abs(delta) < 55) return;
       const r = route();
-      if (delta < 0 && r.slide < 5)
+      if (delta < 0 && r.slide < presentationSlides.length - 1)
         location.hash = `/presentation/${r.slide + 2}`;
       if (delta > 0 && r.slide > 0) location.hash = `/presentation/${r.slide}`;
     };
@@ -2057,7 +2113,7 @@ document.onkeydown = (e) => {
   if (!r.presentation) return;
   const tag = document.activeElement?.tagName;
   if (["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
-  if (["ArrowRight", "PageDown", " "].includes(e.key) && r.slide < 5) {
+  if (["ArrowRight", "PageDown", " "].includes(e.key) && r.slide < presentationSlides.length - 1) {
     e.preventDefault();
     location.hash = `/presentation/${r.slide + 2}`;
   }
@@ -2066,7 +2122,7 @@ document.onkeydown = (e) => {
     location.hash = `/presentation/${r.slide}`;
   }
   if (e.key === "Home") location.hash = "/presentation/1";
-  if (e.key === "End") location.hash = "/presentation/6";
+  if (e.key === "End") location.hash = `/presentation/${presentationSlides.length}`;
 };
 window.addEventListener("hashchange", render);
 window.addEventListener("storage", event => {

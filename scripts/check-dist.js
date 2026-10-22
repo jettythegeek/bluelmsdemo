@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const root = path.resolve(__dirname, "..", "dist");
 const required = [
-  "index.html", "app.js", "styles.css", "demo-config.js",
+  "index.html", "app.js", "control-centre.js", "styles.css", "demo-config.js",
   "vendor/qrcode.js", "vendor/phosphor/regular/style.css",
   "vendor/phosphor/regular/Phosphor.woff2", "assets/bgdl-logo.png",
 ];
@@ -23,6 +23,6 @@ for (const [, reference] of fontCss.matchAll(/url\("([^"#]+)(?:#[^"]*)?"\)/g)) {
   if (!fs.existsSync(path.resolve(root, path.dirname(fontCssPath), reference)))
     throw new Error(`Missing icon font: ${reference}`);
 }
-for (const file of ["app.js", "demo-config.js", "vendor/qrcode.js"])
+for (const file of ["app.js", "control-centre.js", "demo-config.js", "vendor/qrcode.js"])
   new Function(fs.readFileSync(path.join(root, file), "utf8"));
 console.log("Verified production HTML, JavaScript, styles, logo, QR library and all icon fonts.");
